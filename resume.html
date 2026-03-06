@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume — Reda Essabre</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='7' fill='none' stroke='%23ffffff' stroke-width='2'/></svg>">
+  <style>
+    @media print {
+      header,footer,.btn,.egg-hint,#overlay,#sun-modal,body::after{display:none!important}
+      body{background:white;color:black}
+      .timeline-entry{border-left-color:#333}
+      .outcome-block{border-color:#333}
+      .resume-layout{border-color:#333}
+    }
+  </style>
+</head>
+<body>
+<div id="overlay"></div>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <svg class="logo-sun" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="8" stroke="white" stroke-width="2"/><line x1="20" y1="2" x2="20" y2="8" stroke="white" stroke-width="2"/><line x1="20" y1="32" x2="20" y2="38" stroke="white" stroke-width="2"/><line x1="2" y1="20" x2="8" y2="20" stroke="white" stroke-width="2"/><line x1="32" y1="20" x2="38" y2="20" stroke="white" stroke-width="2"/><line x1="6.7" y1="6.7" x2="10.9" y2="10.9" stroke="white" stroke-width="2"/><line x1="29.1" y1="29.1" x2="33.3" y2="33.3" stroke="white" stroke-width="2"/><line x1="33.3" y1="6.7" x2="29.1" y2="10.9" stroke="white" stroke-width="2"/><line x1="10.9" y1="29.1" x2="6.7" y2="33.3" stroke="white" stroke-width="2"/></svg>
+      <div class="logo-text">Reda Essabre<span>☀ Sun Signature</span></div>
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="resume.html">Resume</a>
+      <a href="work.html">Work</a>
+      <a href="contact.html">Contact</a>
+      <a href="game.html" class="nav-game">▶ PLAY</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section style="padding:2.5rem 0;">
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;">
+        <div>
+          <span class="section-label">// Resume / RE-CV-01</span>
+          <h1 style="font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2.8rem);font-weight:900;letter-spacing:0.08em;text-transform:uppercase;line-height:0.95;color:var(--paper);">
+            Reda<br>Essabre
+          </h1>
+          <p style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.25em;color:var(--amber);text-transform:uppercase;margin-top:0.4rem;">
+            Data Services Consultant · Automation Engineer
+          </p>
+        </div>
+        <button class="btn btn-filled" onclick="window.print()" style="height:fit-content;">⎙ DOWNLOAD PDF</button>
+      </div>
+
+      <div class="resume-layout">
+        <!-- MAIN -->
+        <div class="resume-main">
+
+          <!-- SUMMARY -->
+          <div style="margin-bottom:2.5rem;">
+            <span class="section-label">// 00 — Profile</span>
+            <h2>Summary</h2>
+            <p style="font-family:var(--font-mono);font-size:0.78rem;color:rgba(255,255,255,0.6);line-height:1.8;">
+              <!-- TODO: Replace with your own summary -->
+              Data Services Consultant with 5+ years designing and implementing data automation systems,
+              SQL-driven reporting pipelines, and rule-based workflows for production environments.
+              Specialised in turning manual, error-prone operational processes into reliable, scalable systems.
+              Experience spans student management platforms, business value chain workflows, and
+              cloud-integrated data environments. Currently expanding into AI-powered data operations
+              and automation consulting.
+            </p>
+          </div>
+
+          <!-- EXPERIENCE -->
+          <div style="margin-bottom:2.5rem;">
+            <span class="section-label">// 01 — Experience</span>
+            <h2>Work History</h2>
+
+            <div class="timeline-entry">
+              <div class="timeline-header">
+                <div>
+                  <div class="timeline-title">Data Services Consultant</div>
+                  <div class="timeline-org">[Company / Platform] <!-- TODO --></div>
+                </div>
+                <div class="timeline-date">20XX — Present</div>
+              </div>
+              <div class="timeline-body">
+                <!-- TODO: Replace with your real responsibilities -->
+                <ul>
+                  <li>Design and implement complex SQL queries for student enrolment, funding category extraction, and overdue reporting systems.</li>
+                  <li>Configure and maintain rule engines for automated workflows: late fee triggers, account holds, communication dispatches.</li>
+                  <li>Build and optimise reporting pipelines connected to live operational dashboards used by client teams daily.</li>
+                  <li>Lead technical implementation sessions with solutions architects, product teams, and client teams.</li>
+                  <li>Extract and transform JSON data fields within multi-table database structures for downstream reporting.</li>
+                  <li>Diagnose and resolve query performance issues — reduce report generation time by up to [X]%.</li>
+                  <li>Draft technical documentation, implementation guides, and client-facing system explanations in English, French, and Arabic.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="timeline-entry">
+              <div class="timeline-header">
+                <div>
+                  <div class="timeline-title">[Previous Role] <!-- TODO --></div>
+                  <div class="timeline-org">[Company] <!-- TODO --></div>
+                </div>
+                <div class="timeline-date">20XX — 20XX</div>
+              </div>
+              <div class="timeline-body">
+                <ul>
+                  <li>[TODO: Add your responsibilities and achievements for this role]</li>
+                  <li>[TODO: Focus on data, automation, SQL, reporting, or system work]</li>
+                  <li>[TODO: Include measurable outcomes — e.g. "Reduced processing time by 40%"]</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROJECTS -->
+          <div style="margin-bottom:2.5rem;">
+            <span class="section-label">// 02 — Projects</span>
+            <h2>Independent Engineering</h2>
+
+            <div class="timeline-entry">
+              <div class="timeline-header">
+                <div>
+                  <div class="timeline-title">AI Data-Ops Platform</div>
+                  <div class="timeline-org">Personal Engineering Project</div>
+                </div>
+                <div class="timeline-date">2024 — Ongoing</div>
+              </div>
+              <div class="timeline-body">
+                <p style="margin-bottom:0.5rem;">A structured 9-week senior-grade engineering project demonstrating end-to-end system design thinking.</p>
+                <ul>
+                  <li><strong>Phase 1–2:</strong> FastAPI backend, PostgreSQL schema, event ingestion system, structured logging.</li>
+                  <li><strong>Phase 3–4:</strong> Queue systems with retry logic, idempotent event processing.</li>
+                  <li><strong>Phase 5–6:</strong> Data validation layers, versioning, audit tables.</li>
+                  <li><strong>Phase 7–8:</strong> LLM integration, Retrieval-Augmented Generation, prompt templates, cost tracking.</li>
+                  <li><strong>Phase 9:</strong> Observability, metrics collection, production-grade documentation.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="timeline-entry">
+              <div class="timeline-header">
+                <div>
+                  <div class="timeline-title">n8n Automation Workflows</div>
+                  <div class="timeline-org">Freelance / Entrepreneurship</div>
+                </div>
+                <div class="timeline-date">2024 — Ongoing</div>
+              </div>
+              <div class="timeline-body">
+                Building client-ready automation workflows using n8n, REST APIs, and data transformation nodes.
+                End-to-end automation delivery for SMBs. Target: automation consulting practice.
+              </div>
+            </div>
+          </div>
+
+          <!-- EDUCATION -->
+          <div>
+            <span class="section-label">// 03 — Education</span>
+            <h2>Education</h2>
+            <div class="timeline-entry">
+              <div class="timeline-header">
+                <div>
+                  <div class="timeline-title">[Degree / Certification] <!-- TODO --></div>
+                  <div class="timeline-org">[Institution] <!-- TODO --></div>
+                </div>
+                <div class="timeline-date">20XX</div>
+              </div>
+              <div class="timeline-body"><!-- TODO --></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="resume-sidebar">
+
+          <div style="margin-bottom:1.5rem;">
+            <span class="section-label">// Outcomes</span>
+            <div class="outcome-block">
+              <span class="outcome-metric">−3h</span>
+              <span class="outcome-desc">Weekly manual reporting time eliminated via SQL automation</span>
+            </div>
+            <div class="outcome-block">
+              <span class="outcome-metric">100+</span>
+              <span class="outcome-desc">Rule-based automations configured in production</span>
+            </div>
+            <div class="outcome-block">
+              <span class="outcome-metric">0</span>
+              <span class="outcome-desc">Manual interventions for automated hold/fee workflows</span>
+            </div>
+            <!-- TODO: Replace with real numbers -->
+          </div>
+
+          <div style="margin-bottom:1.5rem;border:2px solid rgba(255,255,255,0.15);padding:1rem;">
+            <span class="section-label">// Skills</span>
+            <ul class="skill-list" style="font-size:0.68rem;">
+              <li>SQL (complex, optimised)</li>
+              <li>JSON data extraction</li>
+              <li>Rule engine configuration</li>
+              <li>Reporting pipelines</li>
+              <li>Dashboard integration</li>
+              <li>FastAPI + Python</li>
+              <li>PostgreSQL</li>
+              <li>n8n automation</li>
+              <li>LLM / RAG integration</li>
+              <li>Event-driven systems</li>
+              <li>Data validation</li>
+              <li>Observability</li>
+            </ul>
+          </div>
+
+          <div style="margin-bottom:1.5rem;border:2px solid rgba(255,255,255,0.15);padding:1rem;">
+            <span class="section-label">// Tools</span>
+            <div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.5rem;">
+              <span class="case-tech-tag">SQL</span><span class="case-tech-tag">PostgreSQL</span><span class="case-tech-tag">FastAPI</span><span class="case-tech-tag">Python</span><span class="case-tech-tag">n8n</span><span class="case-tech-tag">REST APIs</span><span class="case-tech-tag">JSON</span><span class="case-tech-tag">Git</span><span class="case-tech-tag">LLM APIs</span><span class="case-tech-tag">RAG</span>
+            </div>
+          </div>
+
+          <div style="margin-bottom:1.5rem;border:2px solid rgba(255,255,255,0.15);padding:1rem;">
+            <span class="section-label">// Languages</span>
+            <ul class="skill-list" style="font-size:0.68rem;margin-top:0.5rem;">
+              <li>French — Native</li>
+              <li>English — Professional</li>
+              <li>Arabic — Native</li>
+            </ul>
+          </div>
+
+          <div style="border:2px solid rgba(255,255,255,0.15);padding:1rem;">
+            <span class="section-label">// Contact</span>
+            <div style="font-family:var(--font-mono);font-size:0.65rem;line-height:2;color:rgba(255,255,255,0.5);margin-top:0.4rem;">
+              <div>📍 France — Remote-ready</div>
+              <div>✉ <a href="contact.html">Contact form →</a></div>
+              <div>💼 <a href="https://linkedin.com" target="_blank">LinkedIn ↗</a></div>
+              <div>⌨ <a href="https://github.com" target="_blank">GitHub ↗</a></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="8" stroke="white" stroke-width="2"/><line x1="20" y1="2" x2="20" y2="8" stroke="white" stroke-width="2"/><line x1="20" y1="32" x2="20" y2="38" stroke="white" stroke-width="2"/><line x1="2" y1="20" x2="8" y2="20" stroke="white" stroke-width="2"/><line x1="32" y1="20" x2="38" y2="20" stroke="white" stroke-width="2"/></svg>
+      <div class="footer-brand-text"><strong>Reda Essabre</strong>© 2025 · ☀ Sun Signature</div>
+    </div>
+    <div class="footer-mid"><div class="footer-dither-band"></div></div>
+    <div class="footer-nav">
+      <a href="index.html">Home</a><a href="work.html">Work</a><a href="contact.html">Contact</a><a href="game.html">▶ Play</a>
+    </div>
+  </div>
+</footer>
+
+<div class="modal-backdrop" id="sun-modal">
+  <div class="modal-box">
+    <div class="modal-header"><span>☀ SUN CONSOLE / UNLOCKED</span><button class="modal-close" onclick="closeModal()">[ × CLOSE ]</button></div>
+    <div class="modal-body">You typed <strong>SUN</strong>.<br><br><em>"The best automation is the kind you don't notice — until it stops."</em></div>
+    <div class="modal-footer"><a href="contact.html" class="btn btn-filled" onclick="closeModal()">◆ LET'S TALK →</a></div>
+  </div>
+</div>
+<div class="egg-hint">SECRET: TRY TYPING  S · U · N</div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work — Reda Essabre</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .full-case { border: 3px solid white; margin-bottom: 2.5rem; }
+    .full-case-header {
+      background: white; color: black;
+      padding: 0.6rem 1.2rem;
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    .full-case-body { padding: 1.5rem; }
+    .full-case-title {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1.1rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: white; margin-bottom: 1.2rem;
+    }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: rgba(255,255,255,0.15); margin-bottom: 1.2rem; }
+    .col-block { background: black; padding: 1rem; }
+    .col-label {
+      font-family: var(--font-mono); font-size: 0.52rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--amber); margin-bottom: 0.5rem; display: block;
+    }
+    .col-text { font-family: var(--font-mono); font-size: 0.7rem; color: rgba(255,255,255,0.65); line-height: 1.6; }
+    .placeholder-img {
+      border: 1px dashed rgba(255,255,255,0.15); padding: 1rem;
+      font-family: var(--font-mono); font-size: 0.6rem; color: rgba(255,255,255,0.2);
+      text-align: center; margin-bottom: 1.2rem; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    @media (max-width:640px) { .three-col { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div id="overlay"></div>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <svg class="logo-sun" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="8" stroke="white" stroke-width="2"/><line x1="20" y1="2" x2="20" y2="8" stroke="white" stroke-width="2"/><line x1="20" y1="32" x2="20" y2="38" stroke="white" stroke-width="2"/><line x1="2" y1="20" x2="8" y2="20" stroke="white" stroke-width="2"/><line x1="32" y1="20" x2="38" y2="20" stroke="white" stroke-width="2"/><line x1="6.7" y1="6.7" x2="10.9" y2="10.9" stroke="white" stroke-width="2"/><line x1="29.1" y1="29.1" x2="33.3" y2="33.3" stroke="white" stroke-width="2"/><line x1="33.3" y1="6.7" x2="29.1" y2="10.9" stroke="white" stroke-width="2"/><line x1="10.9" y1="29.1" x2="6.7" y2="33.3" stroke="white" stroke-width="2"/></svg>
+      <div class="logo-text">Reda Essabre<span>☀ Sun Signature</span></div>
+    </a>
+    <nav>
+      <a href="index.html">Home</a><a href="resume.html">Resume</a><a href="work.html">Work</a><a href="contact.html">Contact</a><a href="game.html" class="nav-game">▶ PLAY</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section style="padding:2.5rem 0;">
+    <div class="container">
+      <span class="section-label">// Case Files</span>
+      <h1 style="font-family:var(--font-display);font-size:clamp(1.8rem,4vw,3rem);font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:white;margin-bottom:0.5rem;">Work</h1>
+      <p style="font-family:var(--font-mono);font-size:0.78rem;color:rgba(255,255,255,0.45);margin-bottom:2.5rem;max-width:58ch;line-height:1.7;">
+        Real problems. Real systems. Production-grade automation. Each case: understand the problem → design the right abstraction → automate it properly.
+      </p>
+
+      <!-- CASE 001 -->
+      <div class="full-case">
+        <div class="full-case-header">
+          <span>CASE-001 / SQL · Reporting · Data Engineering</span>
+          <span style="background:rgba(0,0,0,0.2);padding:0.1rem 0.5rem;border:1px solid rgba(0,0,0,0.3);">Closed ✓</span>
+        </div>
+        <div class="full-case-body">
+          <div class="full-case-title">Funding Category Extraction Pipeline</div>
+          <div class="three-col">
+            <div class="col-block" style="background-image:radial-gradient(circle,rgba(255,255,255,0.04)1px,transparent 1px);background-size:5px 5px;">
+              <span class="col-label">Problem</span>
+              <span class="col-text">Student funding categories stored as nested JSON fields inside a multi-table schema. Analysts extracted data manually each week — 3 hours of work prone to human error and version inconsistency.</span>
+            </div>
+            <div class="col-block">
+              <span class="col-label">Approach</span>
+              <span class="col-text">Designed a SQL extraction query using JSON path functions, multi-table joins, and conditional aggregation. Built a parameterised report connected directly to the dashboard output layer.</span>
+            </div>
+            <div class="col-block" style="background-image:radial-gradient(circle,rgba(255,255,255,0.04)1px,transparent 1px);background-size:5px 5px;">
+              <span class="col-label">Outcome</span>
+              <span class="col-text">Zero manual extraction. Report runs on demand or on schedule. Analysts redirected from data wrangling to interpretation. Live dashboard always reflects current state.</span>
+            </div>
+          </div>
+          <div class="placeholder-img">[ Before/After screenshot placeholder — replace with your own ]</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.4rem;"><span class="case-tech-tag">SQL</span><span class="case-tech-tag">JSON Path</span><span class="case-tech-tag">Multi-table Join</span><span class="case-tech-tag">Reporting Engine</span><span class="case-tech-tag">Dashboard</span></div>
+        </div>
+      </div>
+
+      <!-- CASE 002 -->
+      <div class="full-case">
+        <div class="full-case-header">
+          <span>CASE-002 / Rule Engine · Automation · Workflows</span>
+          <span style="background:rgba(0,0,0,0.2);padding:0.1rem 0.5rem;border:1px solid rgba(0,0,0,0.3);">Closed ✓</span>
+        </div>
+        <div class="full-case-body">
+          <div class="full-case-title">Automated Late Fee & Account Hold System</div>
+          <div class="three-col">
+            <div class="col-block">
+              <span class="col-label">Problem</span>
+              <span class="col-text">Account holds and late fee processing applied manually by staff. Inconsistent timing led to disputes, missed fees, and compliance risk. High volume created daily operational burden.</span>
+            </div>
+            <div class="col-block" style="background-image:radial-gradient(circle,rgba(255,255,255,0.04)1px,transparent 1px);background-size:5px 5px;">
+              <span class="col-label">Approach</span>
+              <span class="col-text">Mapped all business rules into a structured rule-set design. Configured event-triggered automation: funding change → trigger evaluation → apply action → log. Full audit trail maintained.</span>
+            </div>
+            <div class="col-block">
+              <span class="col-label">Outcome</span>
+              <span class="col-text">Zero manual intervention for standard cases. Consistent, time-accurate application of fees and holds. Staff time freed from routine enforcement tasks.</span>
+            </div>
+          </div>
+          <div class="placeholder-img">[ Rule-set diagram placeholder ]</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.4rem;"><span class="case-tech-tag">Rule Engine</span><span class="case-tech-tag">Event Triggers</span><span class="case-tech-tag">Workflow Automation</span><span class="case-tech-tag">Audit Logging</span></div>
+        </div>
+      </div>
+
+      <!-- CASE 003 -->
+      <div class="full-case">
+        <div class="full-case-header">
+          <span>CASE-003 / SQL · Performance · Dashboards</span>
+          <span style="background:rgba(0,0,0,0.2);padding:0.1rem 0.5rem;border:1px solid rgba(0,0,0,0.3);">Closed ✓</span>
+        </div>
+        <div class="full-case-body">
+          <div class="full-case-title">Query Optimisation — Overdue Reporting Dashboard</div>
+          <div class="three-col">
+            <div class="col-block" style="background-image:radial-gradient(circle,rgba(255,255,255,0.07)1px,transparent 1px);background-size:4px 4px;">
+              <span class="col-label">Problem</span>
+              <span class="col-text">Overdue report used by operations team was timing out under load. Complex multi-join query with no indexing strategy — load time 45+ seconds.</span>
+            </div>
+            <div class="col-block">
+              <span class="col-label">Approach</span>
+              <span class="col-text">Profiled query execution plan. Identified cross-product join and redundant subquery. Restructured joins, added targeted indexes, introduced CTEs to break down logic.</span>
+            </div>
+            <div class="col-block" style="background-image:radial-gradient(circle,rgba(255,255,255,0.04)1px,transparent 1px);background-size:5px 5px;">
+              <span class="col-label">Outcome</span>
+              <span class="col-text">Load time: 45s → under 3s. Dashboard refreshes in real-time. Report adopted by additional teams due to reliability improvement.</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.4rem;"><span class="case-tech-tag">SQL</span><span class="case-tech-tag">Query Optimisation</span><span class="case-tech-tag">Indexing</span><span class="case-tech-tag">CTE</span><span class="case-tech-tag">Dashboard</span></div>
+        </div>
+      </div>
+
+      <!-- CASE 004 -->
+      <div class="full-case">
+        <div class="full-case-header">
+          <span>CASE-004 / n8n · API · Integration</span>
+          <span style="background:rgba(0,0,0,0.2);padding:0.1rem 0.5rem;border:1px solid rgba(0,0,0,0.3);">Closed ✓</span>
+        </div>
+        <div class="full-case-body">
+          <div class="full-case-title">End-to-End Client Onboarding Automation</div>
+          <div class="three-col">
+            <div class="col-block">
+              <span class="col-label">Problem</span>
+              <span class="col-text">New client onboarding required manual data entry across 3 systems, email drafts, and calendar scheduling. Average completion time: 2–3 days.</span>
+            </div>
+            <div class="col-block" style="background-image:radial-gradient(circle,rgba(255,255,255,0.04)1px,transparent 1px);background-size:5px 5px;">
+              <span class="col-label">Approach</span>
+              <span class="col-text">Built n8n workflow triggered by form submission. Data routed to CRM, project tool, and email system via API. Conditional logic for client tier, automated welcome sequence.</span>
+            </div>
+            <div class="col-block">
+              <span class="col-label">Outcome</span>
+              <span class="col-text">Onboarding time: 2–3 days → under 10 minutes. Zero manual data entry. Consistent communication regardless of staff availability.</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.4rem;"><span class="case-tech-tag">n8n</span><span class="case-tech-tag">REST APIs</span><span class="case-tech-tag">Webhooks</span><span class="case-tech-tag">CRM Integration</span></div>
+        </div>
+      </div>
+
+      <!-- CASE 005 -->
+      <div class="full-case">
+        <div class="full-case-header">
+          <span>CASE-005 / FastAPI · PostgreSQL · AI · Event Systems</span>
+          <span style="color:var(--amber);font-family:var(--font-mono);font-size:0.55rem;letter-spacing:0.2em;">IN PROGRESS ◆</span>
+        </div>
+        <div class="full-case-body">
+          <div class="full-case-title">AI Data-Ops Platform — Personal Engineering Project</div>
+          <div class="three-col">
+            <div class="col-block">
+              <span class="col-label">Scope</span>
+              <span class="col-text">9-week senior-grade engineering project. Full system design from event ingestion to LLM integration, with production-grade reliability patterns throughout.</span>
+            </div>
+            <div class="col-block" style="background-image:radial-gradient(circle,rgba(255,255,255,0.06)1px,transparent 1px);background-size:4.5px 4.5px;">
+              <span class="col-label">Architecture</span>
+              <span class="col-text">FastAPI backend → PostgreSQL → event queue with retry/idempotency → validation layer → RAG-enabled LLM module → observability dashboard.</span>
+            </div>
+            <div class="col-block">
+              <span class="col-label">Key Patterns</span>
+              <span class="col-text">Idempotent event processing. Retry with exponential backoff. Audit tables. Prompt templates + cost tracking. Structured metrics and alerting.</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.4rem;"><span class="case-tech-tag">FastAPI</span><span class="case-tech-tag">PostgreSQL</span><span class="case-tech-tag">Queues</span><span class="case-tech-tag">Idempotency</span><span class="case-tech-tag">RAG</span><span class="case-tech-tag">LLM APIs</span><span class="case-tech-tag">Observability</span></div>
+        </div>
+      </div>
+
+      <div style="border:2px dashed rgba(255,255,255,0.12);padding:1.5rem;text-align:center;margin-top:1rem;">
+        <p style="font-family:var(--font-mono);font-size:0.7rem;color:rgba(255,255,255,0.3);margin-bottom:1rem;">
+          More case studies available on request. NDA-protected work can be discussed in private.
+        </p>
+        <a href="contact.html" class="btn btn-amber">◆ DISCUSS A PROJECT</a>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="8" stroke="white" stroke-width="2"/><line x1="20" y1="2" x2="20" y2="8" stroke="white" stroke-width="2"/><line x1="20" y1="32" x2="20" y2="38" stroke="white" stroke-width="2"/><line x1="2" y1="20" x2="8" y2="20" stroke="white" stroke-width="2"/><line x1="32" y1="20" x2="38" y2="20" stroke="white" stroke-width="2"/></svg>
+      <div class="footer-brand-text"><strong>Reda Essabre</strong>© 2025 · ☀ Sun Signature</div>
+    </div>
+    <div class="footer-mid"><div class="footer-dither-band"></div></div>
+    <div class="footer-nav"><a href="index.html">Home</a><a href="resume.html">Resume</a><a href="contact.html">Contact</a><a href="game.html">▶ Play</a></div>
+  </div>
+</footer>
+
+<div class="modal-backdrop" id="sun-modal">
+  <div class="modal-box">
+    <div class="modal-header"><span>☀ SUN CONSOLE / UNLOCKED</span><button class="modal-close" onclick="closeModal()">[ × CLOSE ]</button></div>
+    <div class="modal-body">You typed <strong>SUN</strong>.<br><br><em>"The best automation is the kind you don't notice — until it stops."</em></div>
+    <div class="modal-footer"><a href="contact.html" class="btn btn-filled" onclick="closeModal()">◆ LET'S TALK →</a></div>
+  </div>
+</div>
+<div class="egg-hint">SECRET: TRY TYPING  S · U · N</div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
