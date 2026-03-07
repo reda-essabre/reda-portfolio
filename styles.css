@@ -60,6 +60,16 @@ body {
   96% { opacity: 0.95; }
 }
 
+@keyframes heroSunSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes ringPulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   #overlay { animation: none; }
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
