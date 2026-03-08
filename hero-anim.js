@@ -1,341 +1,322 @@
 /* ============================================================
-   HERO-ANIM.JS — Cinematic flying hero scene
-   Style: smooth outline art + stars + speed lines + city
-   Exactly matching the reference screenshot
+   HERO-ANIM.JS — SIGNALIS-style scene
+   Character: bold ink figure, top-down isometric, flying
+   Reference: Zelda GBC + SIGNALIS 1-bit dithered aesthetic
    ============================================================ */
 (function () {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
-  const W = 480, H = 300;
-  canvas.width  = W;
-  canvas.height = H;
+  const IW = 240, IH = 150;
+  canvas.width  = IW;
+  canvas.height = IH;
+  canvas.style.imageRendering = 'pixelated';
+  canvas.style.imageRendering = 'crisp-edges';
 
   const C = { bg:'#000000', white:'#ffffff', amber:'#d4a843' };
-  const TILE = 20;
-  let frame = 0, lastTs = 0, signals = 0;
+  let frame = 0, lastTs = 0, signals = 0, scroll = 0;
 
-  // ── GRID ──────────────────────────────────────────────────
-  function grid() {
+  // ── BAYER 4×4 DITHER MATRIX ───────────────────────────────
+  const BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+  function dither(x, y, threshold) {
+    return BAYER[((y&3)<<2)+(x&3)] / 16 < threshold;
+  }
+
+  // ── PIXEL CHARACTER (SIGNALIS / Zelda GBC style) ──────────
+  // Top-down isometric, flying left-to-right
+  // Cape streams right, bold 1-bit ink outline, Bayer shading
+  function drawFigure(ox, oy, t) {
     ctx.save();
-    ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
-    for(let x=0;x<W;x+=TILE){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-    for(let y=0;y<H;y+=TILE){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    // SHADOW (dithered ellipse on ground)
+    const sy = oy + 4;
+    for (let dx = -8; dx <= 8; dx++) {
+      for (let dy = -2; dy <= 2; dy++) {
+        const dist = (dx*dx)/64 + (dy*dy)/4;
+        if (dist <= 1.0 && dither(ox+dx, sy+dy, (1-dist)*0.5)) {
+          ctx.fillStyle = C.white;
+          ctx.fillRect((ox+dx)|0, (sy+dy)|0, 1, 1);
+        }
+      }
+    }
+
+    // CAPE (streams right / behind)
+    const cw = Math.sin(t*3.2)*1.5;
+    // Three cape strips
+    const capeSegs = [{cx:3,cy:-18,cw:6,ch:10},{cx:7,cy:-15,cw:4,ch:7},{cx:11,cy:-12,cw:3,ch:5}];
+    capeSegs.forEach((cs,i) => {
+      const wave = cw*(i+1)*0.4;
+      ctx.fillStyle = C.bg;
+      ctx.fillRect((ox+cs.cx)|0,(oy+cs.cy+wave)|0,cs.cw,cs.ch);
+      ctx.fillStyle = C.white;
+      ctx.fillRect((ox+cs.cx-1)|0,(oy+cs.cy+wave-1)|0,cs.cw+2,1);
+      ctx.fillRect((ox+cs.cx-1)|0,(oy+cs.cy+wave+cs.ch)|0,cs.cw+2,1);
+      ctx.fillRect((ox+cs.cx-1)|0,(oy+cs.cy+wave-1)|0,1,cs.ch+2);
+      ctx.fillRect((ox+cs.cx+cs.cw)|0,(oy+cs.cy+wave-1)|0,1,cs.ch+2);
+      // dither shading on cape
+      for (let dx=0;dx<cs.cw;dx++) for (let dy=1;dy<cs.ch-1;dy++) {
+        if (dither((ox+cs.cx+dx)|0,(oy+cs.cy+dy+wave)|0,0.35-(i*0.07)))
+          { ctx.fillStyle=C.white; ctx.fillRect((ox+cs.cx+dx)|0,(oy+cs.cy+dy+wave)|0,1,1); }
+      }
+    });
+
+    // LEGS
+    // Left leg
+    ctx.fillStyle = C.bg;
+    ctx.fillRect((ox-5)|0,(oy-7)|0,4,7);
+    ctx.fillStyle = C.white;
+    ctx.fillRect((ox-6)|0,(oy-8)|0,1,9);
+    ctx.fillRect((ox-5)|0,(oy-8)|0,5,1);
+    ctx.fillRect((ox-2)|0,(oy)|0,2,1);
+    // Right leg
+    ctx.fillStyle = C.bg;
+    ctx.fillRect((ox+1)|0,(oy-7)|0,4,7);
+    ctx.fillStyle = C.white;
+    ctx.fillRect((ox+5)|0,(oy-8)|0,1,9);
+    ctx.fillRect((ox+1)|0,(oy-8)|0,4,1);
+    ctx.fillRect((ox+1)|0,(oy)|0,2,1);
+    // Leg dither
+    for (let dx=-5;dx<=4;dx++) for (let dy=-7;dy<=-1;dy++) {
+      if (dx===0||dx===-1) continue;
+      if (dither((ox+dx)|0,(oy+dy)|0,0.28)) { ctx.fillStyle=C.white; ctx.fillRect((ox+dx)|0,(oy+dy)|0,1,1); }
+    }
+
+    // TORSO (wider, hero build)
+    ctx.fillStyle = C.bg;
+    ctx.fillRect((ox-7)|0,(oy-20)|0,14,13);
+    ctx.fillStyle = C.white;
+    ctx.fillRect((ox-8)|0,(oy-21)|0,16,1);
+    ctx.fillRect((ox-8)|0,(oy-8)|0,16,1);
+    ctx.fillRect((ox-8)|0,(oy-21)|0,1,14);
+    ctx.fillRect((ox+7)|0,(oy-21)|0,1,14);
+    // Torso Bayer shading (light from right)
+    for (let dx=-7;dx<=6;dx++) for (let dy=-20;dy<=-9;dy++) {
+      const shade = dx>2 ? 0.60 : (dx>-2 ? 0.32 : 0.14);
+      if (dither((ox+dx)|0,(oy+dy)|0,shade)) { ctx.fillStyle=C.white; ctx.fillRect((ox+dx)|0,(oy+dy)|0,1,1); }
+    }
+    // Belt line
+    ctx.fillStyle = C.white;
+    ctx.fillRect((ox-7)|0,(oy-10)|0,14,1);
+    // Belt buckle
+    ctx.fillRect((ox-1)|0,(oy-11)|0,2,2);
+    ctx.fillStyle = C.bg;
+    ctx.fillRect((ox)|0,(oy-10)|0,1,1);
+
+    // LEFT ARM (reaching forward)
+    const arm = Math.sin(t*3.2)*2;
+    ctx.fillStyle = C.bg;
+    ctx.fillRect((ox-11)|0,(oy-20+arm)|0,5,4);
+    ctx.fillStyle = C.white;
+    ctx.fillRect((ox-12)|0,(oy-21+arm)|0,7,1);
+    ctx.fillRect((ox-12)|0,(oy-21+arm)|0,1,6);
+    ctx.fillRect((ox-6)|0,(oy-17+arm)|0,1,1);
+    // Hand
+    ctx.fillStyle = C.white;
+    ctx.fillRect((ox-13)|0,(oy-20+arm)|0,3,3);
+    ctx.fillStyle = C.bg;
+    ctx.fillRect((ox-12)|0,(oy-19+arm)|0,1,1);
+
+    // RIGHT ARM (back)
+    ctx.fillStyle = C.bg;
+    ctx.fillRect((ox+7)|0,(oy-20-arm)|0,4,4);
+    ctx.fillStyle = C.white;
+    ctx.fillRect((ox+6)|0,(oy-21-arm)|0,7,1);
+    ctx.fillRect((ox+11)|0,(oy-21-arm)|0,1,5);
+
+    // HEAD (3/4 view, slightly turned)
+    const hx=ox-2, hy=oy-31;
+    ctx.fillStyle = C.bg;
+    ctx.fillRect((hx-4)|0,(hy-6)|0,11,8);
+    ctx.fillStyle = C.white;
+    ctx.fillRect((hx-5)|0,(hy-7)|0,13,1);
+    ctx.fillRect((hx-5)|0,(hy+1)|0,13,1);
+    ctx.fillRect((hx-5)|0,(hy-7)|0,1,9);
+    ctx.fillRect((hx+7)|0,(hy-7)|0,1,9);
+    // Face dither
+    for (let dx=-4;dx<=6;dx++) for (let dy=-6;dy<=0;dy++) {
+      const shade = dx>3?0.65:(dx>0?0.38:0.12);
+      if (dither((hx+dx)|0,(hy+dy)|0,shade)) { ctx.fillStyle=C.white; ctx.fillRect((hx+dx)|0,(hy+dy)|0,1,1); }
+    }
+    // Eyes
+    ctx.fillStyle = C.white;
+    ctx.fillRect((hx-2)|0,(hy-4)|0,2,2);
+    ctx.fillRect((hx+2)|0,(hy-4)|0,2,2);
+    ctx.fillStyle = C.bg;
+    ctx.fillRect((hx-1)|0,(hy-3)|0,1,1);
+    ctx.fillRect((hx+3)|0,(hy-3)|0,1,1);
+
+    // HAIR / HOOD
+    ctx.fillStyle = C.bg;
+    ctx.fillRect((hx-4)|0,(hy-10)|0,12,4);
+    ctx.fillStyle = C.white;
+    ctx.fillRect((hx-5)|0,(hy-11)|0,14,1);
+    ctx.fillRect((hx-5)|0,(hy-11)|0,1,5);
+    ctx.fillRect((hx+8)|0,(hy-11)|0,1,5);
+    for (let dx=-4;dx<=7;dx++) for (let dy=-10;dy<=-7;dy++) {
+      if (dither((hx+dx)|0,(hy+dy)|0,0.28)) { ctx.fillStyle=C.white; ctx.fillRect((hx+dx)|0,(hy+dy)|0,1,1); }
+    }
+
+    // MOTION TRAIL (speed lines behind)
+    for (let i=1;i<=7;i++) {
+      const tx=ox+i*5, ty=oy-14+Math.sin((frame-i*4)*0.07)*3;
+      ctx.globalAlpha = 0.55 - i*0.07;
+      ctx.fillStyle = C.white;
+      for (let q=0;q<3;q++) {
+        if (dither(tx+q,ty-q*3,0.42)) ctx.fillRect((tx+q)|0,(ty-q)|0,1,1);
+      }
+    }
+    ctx.globalAlpha=1;
     ctx.restore();
   }
 
-  // ── SCANLINES ─────────────────────────────────────────────
-  function scanlines() {
-    for(let y=0;y<H;y+=4){ctx.fillStyle='rgba(0,0,0,0.10)';ctx.fillRect(0,y,W,2);}
-    for(let i=0;i<10;i++){ctx.fillStyle=`rgba(255,255,255,${Math.random()*0.02})`;ctx.fillRect(Math.random()*W|0,Math.random()*H|0,1,1);}
-  }
-
   // ── STARS ─────────────────────────────────────────────────
-  const STARS = Array.from({length:110}, () => ({
-    x: Math.random()*W,
-    y: Math.random()*(H*0.82),
-    size: Math.random(),
-    bright: Math.random(),
-    twinkle: Math.random()*Math.PI*2,
-    spd: 0.05 + Math.random()*0.12,
+  const STARS = Array.from({length:65},()=>({
+    x:Math.random()*IW, y:Math.random()*(IH*0.78),
+    bright:Math.random(), spd:0.04+Math.random()*0.09,
+    tw:Math.random()*Math.PI*2
   }));
-
   function drawStars(dt) {
-    STARS.forEach(s => {
-      s.x -= s.spd;
-      if(s.x < 0) { s.x = W; s.y = Math.random()*(H*0.82); }
-      s.twinkle += dt * (1.5 + Math.random()*0.5);
-      const alpha = 0.4 + 0.6 * Math.abs(Math.sin(s.twinkle));
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      if(s.bright > 0.85) {
-        // 4-point star
-        ctx.fillStyle = C.white;
-        ctx.fillRect(s.x|0, (s.y-2)|0, 1, 5);
-        ctx.fillRect((s.x-2)|0, s.y|0, 5, 1);
-        ctx.fillRect(s.x|0, s.y|0, 1, 1);
-      } else if(s.size > 0.6) {
-        ctx.fillStyle = C.white;
-        ctx.fillRect(s.x|0, s.y|0, 2, 2);
-      } else {
-        ctx.fillStyle = C.white;
-        ctx.fillRect(s.x|0, s.y|0, 1, 1);
-      }
-      ctx.restore();
+    STARS.forEach(s=>{
+      s.x-=s.spd; if(s.x<0){s.x=IW;s.y=Math.random()*(IH*0.78);}
+      s.tw+=dt*2;
+      ctx.globalAlpha=0.5+0.5*Math.abs(Math.sin(s.tw));
+      ctx.fillStyle=C.white;
+      if(s.bright>0.9){ctx.fillRect(s.x|0,(s.y-2)|0,1,5);ctx.fillRect((s.x-2)|0,s.y|0,5,1);}
+      else ctx.fillRect(s.x|0,s.y|0,s.bright>0.6?2:1,s.bright>0.6?2:1);
+      ctx.globalAlpha=1;
     });
   }
 
   // ── SUN ───────────────────────────────────────────────────
   function drawSun(t) {
-    const x = W*0.80, y = H*0.22, r = 28;
+    const x=IW*0.83,y=IH*0.19,r=13;
     ctx.save();
-    // Rays
-    ctx.strokeStyle = C.white; ctx.lineWidth = 1.5;
+    ctx.strokeStyle=C.white;ctx.lineWidth=1;
     for(let i=0;i<12;i++){
-      const a = (i/12)*Math.PI*2 + t*0.4;
-      const r1=r+5, r2=r+(i%2===0?14:9);
+      const a=(i/12)*Math.PI*2+t*0.5,r1=r+2,r2=r+(i%2===0?7:4);
       ctx.beginPath();ctx.moveTo(x+Math.cos(a)*r1,y+Math.sin(a)*r1);
       ctx.lineTo(x+Math.cos(a)*r2,y+Math.sin(a)*r2);ctx.stroke();
     }
-    // Circle
-    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-    ctx.fillStyle=C.bg; ctx.fill();
-    ctx.strokeStyle=C.white; ctx.lineWidth=2; ctx.stroke();
-    // Dither inside
-    ctx.fillStyle=C.white;
-    for(let dy=-r;dy<r;dy+=3) for(let dx=-r;dx<r;dx+=3)
-      if(dx*dx+dy*dy < r*r-6) {
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle=C.bg;ctx.fill();ctx.strokeStyle=C.white;ctx.lineWidth=1;ctx.stroke();
+    for(let dy=-r;dy<r;dy+=2) for(let dx=-r;dx<r;dx+=2)
+      if(dx*dx+dy*dy<r*r-3) {
         const d=Math.sqrt(dx*dx+dy*dy)/r;
-        if(Math.random()<(1-d)*0.45) ctx.fillRect((x+dx)|0,(y+dy)|0,2,2);
+        if(dither((x+dx)|0,(y+dy)|0,(1-d)*0.55)){ctx.fillStyle=C.white;ctx.fillRect((x+dx)|0,(y+dy)|0,1,1);}
       }
     ctx.restore();
   }
 
   // ── CITY ──────────────────────────────────────────────────
-  let scroll = 0;
-  const BLDGS = [];
-  for(let i=0;i<20;i++){
-    const bx=i*60+Math.random()*20;
-    const bh=28+Math.random()*78; const bw=20+Math.random()*30;
+  const BLDGS=[];
+  for(let i=0;i<22;i++){
+    const bx=i*55+Math.random()*15,bh=14+Math.random()*40|0,bw=10+Math.random()*16|0;
     const wins=[];
-    for(let wy=5;wy<bh-8;wy+=11)
-      for(let wx=4;wx<bw-4;wx+=9)
-        wins.push({ox:wx,oy:wy,lit:Math.random()>0.44,t:Math.random()*140});
-    BLDGS.push({x:bx,h:bh|0,w:bw|0,wins});
+    for(let wy=4;wy<bh-5;wy+=6) for(let wx=3;wx<bw-3;wx+=5)
+      wins.push({ox:wx,oy:wy,lit:Math.random()>0.4,t:Math.random()*80});
+    BLDGS.push({x:bx,h:bh,w:bw,wins});
   }
-  const WORLD_W = 20*64+80;
-
-  function drawCity() {
-    const ground = H-26;
-    ctx.fillStyle=C.white; ctx.fillRect(0,ground,W,1);
-    // Ground dither
-    ctx.fillStyle=C.white;
-    for(let dy=0;dy<8;dy++) for(let dx=0;dx<W;dx+=3)
-      if(Math.random()<(0.30-dy*0.035)) ctx.fillRect(dx,ground+1+dy,1,1);
-
+  const WORLD_W=22*60+60;
+  function drawCity(){
+    const ground=IH-16;
+    ctx.fillStyle=C.white;ctx.fillRect(0,ground,IW,1);
+    for(let dy=0;dy<5;dy++) for(let dx=0;dx<IW;dx++)
+      if(dither(dx,ground+1+dy,0.28-dy*0.05)){ctx.fillStyle=C.white;ctx.fillRect(dx,ground+1+dy,1,1);}
     BLDGS.forEach(b=>{
-      const bx=((b.x-scroll*0.42)%WORLD_W+WORLD_W)%WORLD_W-10;
-      if(bx>W+50||bx<-b.w-10)return;
+      const bx=((b.x-scroll*0.38)%WORLD_W+WORLD_W)%WORLD_W-10;
+      if(bx>IW+30||bx<-b.w-10)return;
       const by=ground-b.h;
-      ctx.fillStyle=C.bg; ctx.fillRect(bx,by,b.w,b.h);
-      // Outline
+      ctx.fillStyle=C.bg;ctx.fillRect(bx|0,by|0,b.w,b.h);
       ctx.fillStyle=C.white;
-      ctx.fillRect(bx,by,b.w,1); ctx.fillRect(bx,by,1,b.h); ctx.fillRect(bx+b.w-1,by,1,b.h);
-      // Antenna
-      if(b.h>52){ ctx.fillRect((bx+b.w/2-1)|0,by-8,2,8); ctx.fillRect((bx+b.w/2-3)|0,by-9,6,2);}
-      // Windows
+      ctx.fillRect(bx|0,by|0,b.w,1);ctx.fillRect(bx|0,by|0,1,b.h);ctx.fillRect((bx+b.w-1)|0,by|0,1,b.h);
+      if(b.h>28){ctx.fillRect((bx+b.w/2)|0,(by-5)|0,1,5);ctx.fillRect((bx+b.w/2-2)|0,(by-6)|0,4,1);}
+      for(let dy=1;dy<b.h-1;dy++) for(let dx=b.w-5;dx<b.w-1;dx++)
+        if(dither((bx+dx)|0,(by+dy)|0,0.45)){ctx.fillStyle=C.white;ctx.fillRect((bx+dx)|0,(by+dy)|0,1,1);}
       b.wins.forEach(w=>{
-        w.t--;if(w.t<=0){w.lit=Math.random()>0.4;w.t=55+Math.random()*160;}
+        w.t--;if(w.t<=0){w.lit=Math.random()>0.35;w.t=40+Math.random()*100;}
         if(!w.lit)return;
-        ctx.fillStyle=C.white;
-        ctx.fillRect((bx+w.ox)|0,(by+w.oy)|0,3,3);
-        ctx.fillStyle=C.bg; ctx.fillRect((bx+w.ox+1)|0,(by+w.oy+1)|0,1,1);
+        ctx.fillStyle=C.white;ctx.fillRect((bx+w.ox)|0,(by+w.oy)|0,2,2);
+        ctx.fillStyle=C.bg;ctx.fillRect((bx+w.ox+1)|0,(by+w.oy+1)|0,1,1);
       });
     });
   }
 
-  // ── SIGNAL PACKETS (amber ⊕ like reference) ───────────────
-  const PKTS = Array.from({length:5},(_,i)=>({
-    wx:70+i*90, wy:28+Math.sin(i*1.6)*35,
-    t:i*0.9, alive:true, respawn:0,
+  // ── PACKETS ───────────────────────────────────────────────
+  const PKTS=Array.from({length:4},(_,i)=>({
+    wx:60+i*55,wy:20+Math.sin(i*1.4)*28,t:i*0.7,alive:true,respawn:0
   }));
   const SPARKS=[];
-
   function emitSparks(x,y){
-    for(let i=0;i<12;i++){
-      const a=Math.random()*Math.PI*2, s=25+Math.random()*60;
-      SPARKS.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1});
-    }
+    for(let i=0;i<10;i++){const a=Math.random()*Math.PI*2,s=20+Math.random()*50;
+    SPARKS.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1});}
   }
-
+  const HERO_X=IW*0.42;
   function drawPackets(dt){
     PKTS.forEach(p=>{
-      p.t+=dt*3;
-      if(!p.alive){
-        if(frame>p.respawn){p.wx=scroll*0.78+80+Math.random()*140;p.wy=22+Math.random()*70;p.alive=true;}
-        return;
-      }
-      const sx=((p.wx-scroll*0.78)%W+W)%W;
-      const sy=p.wy+Math.sin(p.t)*5;
-      const pulse=0.55+0.45*Math.sin(p.t);
-      const s=Math.round(8*pulse);
-      ctx.save(); ctx.globalAlpha=pulse;
-      // Outer square
-      ctx.strokeStyle=C.amber; ctx.lineWidth=2;
+      p.t+=dt*2.5;
+      if(!p.alive){if(frame>p.respawn){p.wx=scroll*0.72+60+Math.random()*100;p.wy=16+Math.random()*55;p.alive=true;}return;}
+      const sx=((p.wx-scroll*0.72)%IW+IW)%IW,sy=p.wy+Math.sin(p.t)*4;
+      const pulse=0.6+0.4*Math.sin(p.t),s=Math.round(5*pulse);
+      ctx.save();ctx.globalAlpha=pulse;ctx.strokeStyle=C.amber;ctx.lineWidth=1;
       ctx.strokeRect((sx-s)|0,(sy-s)|0,s*2,s*2);
-      // Inner cross
       ctx.fillStyle=C.amber;
-      ctx.fillRect((sx-1)|0,(sy-s+2)|0,2,s*2-4);
-      ctx.fillRect((sx-s+2)|0,(sy-1)|0,s*2-4,2);
-      // Corner dots
-      ctx.fillRect((sx-s+1)|0,(sy-s+1)|0,2,2);
-      ctx.fillRect((sx+s-3)|0,(sy-s+1)|0,2,2);
-      ctx.fillRect((sx-s+1)|0,(sy+s-3)|0,2,2);
-      ctx.fillRect((sx+s-3)|0,(sy+s-3)|0,2,2);
+      ctx.fillRect((sx-1)|0,(sy-s+1)|0,2,s*2-2);ctx.fillRect((sx-s+1)|0,(sy-1)|0,s*2-2,2);
       ctx.restore();
-
-      const dx=sx-HERO.x, dy2=sy-(HERO.y+HERO.bob);
-      if(Math.abs(dx)<22&&Math.abs(dy2)<22){
-        p.alive=false; p.respawn=frame+200; signals++;
-        emitSparks(sx,sy);
-        const el=document.getElementById('hero-signal-count');
-        if(el) el.textContent='SIGNALS: '+signals;
+      const heroBob=Math.sin(frame*0.04)*4;
+      if(Math.abs(sx-HERO_X)<14&&Math.abs(sy-(IH*0.44+heroBob))<14){
+        p.alive=false;p.respawn=frame+180;signals++;emitSparks(sx,sy);
+        const el=document.getElementById('hero-signal-count');if(el)el.textContent='SIGNALS:'+signals;
       }
     });
   }
-
   function drawSparks(dt){
     for(let i=SPARKS.length-1;i>=0;i--){
-      const s=SPARKS[i];
-      s.x+=s.vx*dt; s.y+=s.vy*dt; s.vx*=0.88; s.vy*=0.88; s.life-=dt*2.5;
+      const s=SPARKS[i];s.x+=s.vx*dt;s.y+=s.vy*dt;s.vx*=0.85;s.vy*=0.85;s.life-=dt*2.2;
       if(s.life<=0){SPARKS.splice(i,1);continue;}
-      ctx.save(); ctx.globalAlpha=s.life*0.9; ctx.fillStyle=C.amber;
-      ctx.fillRect(s.x|0,s.y|0,2,2); ctx.restore();
+      ctx.globalAlpha=s.life*0.85;ctx.fillStyle=C.amber;ctx.fillRect(s.x|0,s.y|0,1,1);ctx.globalAlpha=1;
     }
   }
 
-  // ── LIGHT ORB — the signal, the idea, the energy ────────────
-  // A glowing orb floating through the scene.
-  // Represents: a signal traveling through noise.
-  // Same construction style as the sun — rings, rays, dither.
-
-  const HERO = { x: W*0.48, y: H*0.42, bob:0, bobDir:1 };
-
-  function drawHero(dt) {
-    HERO.bob += HERO.bobDir * dt * 18;
-    if(HERO.bob >  7) HERO.bobDir = -1;
-    if(HERO.bob < -7) HERO.bobDir =  1;
-
-    const ox = HERO.x, oy = HERO.y + HERO.bob;
-    const t  = frame * 0.022;
-    const breathe = 1 + 0.08 * Math.sin(frame * 0.045);
-
-    // ── OUTER GLOW RINGS (fade out, like light diffusing) ──
-    [28, 22, 17].forEach((r, i) => {
-      const alpha = [0.08, 0.14, 0.22][i];
-      ctx.save();
-      ctx.globalAlpha = alpha * (0.7 + 0.3 * Math.sin(frame*0.04 + i));
-      ctx.strokeStyle = C.white;
-      ctx.lineWidth   = 1;
-      ctx.beginPath();
-      ctx.arc(ox, oy, r * breathe, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-    });
-
-    // ── LIGHT RAYS — 8 rays rotating slowly outward ──
-    ctx.save();
-    ctx.strokeStyle = C.white;
-    for(let i = 0; i < 8; i++) {
-      const a  = (i / 8) * Math.PI * 2 + t * 0.6;
-      const r1 = 13 * breathe;
-      const r2 = r1 + (i % 2 === 0 ? 14 : 9);
-      const alpha = 0.5 + 0.5 * Math.sin(frame * 0.05 + i);
-      ctx.globalAlpha = alpha;
-      ctx.lineWidth   = i % 2 === 0 ? 1.5 : 1;
-      ctx.beginPath();
-      ctx.moveTo(ox + Math.cos(a) * r1, oy + Math.sin(a) * r1);
-      ctx.lineTo(ox + Math.cos(a) * r2, oy + Math.sin(a) * r2);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    // ── MAIN CIRCLE — solid black fill, white border ──
-    ctx.save();
-    ctx.fillStyle   = C.bg;
-    ctx.strokeStyle = C.white;
-    ctx.lineWidth   = 2;
-    ctx.beginPath();
-    ctx.arc(ox, oy, 12 * breathe, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-
-    // ── DITHER FILL inside (same as sun) ──
-    const r = 11;
-    ctx.fillStyle = C.white;
-    for(let dy = -r; dy < r; dy += 3)
-      for(let dx = -r; dx < r; dx += 3)
-        if(dx*dx + dy*dy < r*r - 4) {
-          const d = Math.sqrt(dx*dx + dy*dy) / r;
-          if(Math.random() < (1 - d) * 0.55)
-            ctx.fillRect((ox+dx)|0, (oy+dy)|0, 2, 2);
-        }
-
-    // ── AMBER INNER CORE — the hottest point ──
-    ctx.save();
-    ctx.fillStyle   = C.amber;
-    ctx.strokeStyle = C.amber;
-    ctx.lineWidth   = 1;
-    // Core circle
-    ctx.beginPath();
-    ctx.arc(ox, oy, 4 * breathe, 0, Math.PI * 2);
-    ctx.fill();
-    // Amber pulse ring
-    const pulsR = 6 + 3 * Math.abs(Math.sin(frame * 0.07));
-    ctx.globalAlpha = 0.6 * (1 - (pulsR - 6) / 3);
-    ctx.beginPath();
-    ctx.arc(ox, oy, pulsR, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-
-    // ── LIGHT TRAIL — soft streak left behind as it floats ──
-    ctx.save();
-    for(let i = 1; i <= 10; i++) {
-      const tx2 = ox + i * 5;
-      const ty2 = oy + Math.sin((frame - i*2) * 0.045) * 7;
-      ctx.globalAlpha = (0.10 - i * 0.009);
-      ctx.fillStyle   = C.white;
-      ctx.beginPath();
-      ctx.arc(tx2, ty2, (3 - i * 0.22), 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
+  // ── SCANLINES ─────────────────────────────────────────────
+  function scanlines(){
+    for(let y=0;y<IH;y+=3){ctx.fillStyle='rgba(0,0,0,0.10)';ctx.fillRect(0,y,IW,1);}
+    for(let i=0;i<6;i++){ctx.fillStyle=`rgba(255,255,255,${Math.random()*0.03})`;
+    ctx.fillRect(Math.random()*IW|0,Math.random()*IH|0,1,1);}
   }
 
   // ── HUD ───────────────────────────────────────────────────
-  function drawHUD() {
-    ctx.fillStyle=C.bg; ctx.fillRect(0,H-22,W,22);
-    ctx.fillStyle=C.white; ctx.fillRect(0,H-23,W,1);
-    // left dot
-    ctx.fillStyle=C.white;
-    ctx.beginPath(); ctx.arc(12,H-11,4,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle=C.bg; ctx.beginPath(); ctx.arc(12,H-11,2,0,Math.PI*2); ctx.fill();
-    ctx.font='bold 9px monospace'; ctx.letterSpacing='2px';
-    ctx.fillStyle=C.white; ctx.textAlign='left';
-    ctx.fillText('RE / DATA OPS ACTIVE',22,H-8);
-    ctx.textAlign='right'; ctx.fillStyle=C.amber;
-    ctx.fillText('SIGNALS:'+signals,W-8,H-8);
-    ctx.textAlign='left'; ctx.letterSpacing='0';
+  function drawHUD(){
+    ctx.fillStyle=C.bg;ctx.fillRect(0,IH-12,IW,12);
+    ctx.fillStyle=C.white;ctx.fillRect(0,IH-13,IW,1);
+    ctx.font='bold 6px monospace';
+    ctx.fillStyle=C.white;ctx.textAlign='left';ctx.fillText('RE / DATA OPS',4,IH-4);
+    ctx.textAlign='right';ctx.fillStyle=C.amber;ctx.fillText('SIG:'+signals,IW-4,IH-4);
+    ctx.textAlign='left';
   }
 
-  // ── MAIN LOOP ─────────────────────────────────────────────
-  function loop(ts) {
-    const dt = Math.min((ts-lastTs)/1000, 0.05);
-    lastTs=ts; frame++;
-    scroll += 48*dt;
-
-    ctx.fillStyle=C.bg; ctx.fillRect(0,0,W,H);
-    grid();
-
-    // Corner dither
-    for(let x=0;x<W*0.14;x+=3) for(let y=0;y<H-22;y+=3)
-      if(Math.random()<(1-x/(W*0.14))*0.42){ctx.fillStyle=C.white;ctx.fillRect(x,y,1,1);}
-    for(let x=W*0.86;x<W;x+=3) for(let y=0;y<H-22;y+=3)
-      if(Math.random()<((x-W*0.86)/(W*0.14))*0.42){ctx.fillStyle=C.white;ctx.fillRect(x,y,1,1);}
-
+  // ── LOOP ──────────────────────────────────────────────────
+  function loop(ts){
+    const dt=Math.min((ts-lastTs)/1000,0.05);lastTs=ts;frame++;scroll+=28*dt;
+    ctx.fillStyle=C.bg;ctx.fillRect(0,0,IW,IH);
+    ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
+    for(let x=0;x<IW;x+=12){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,IH);ctx.stroke();}
+    for(let y=0;y<IH;y+=12){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(IW,y);ctx.stroke();}
+    // Vignette dither
+    for(let x=0;x<IW*0.12;x+=2) for(let y=0;y<IH-12;y+=2)
+      if(dither(x,y,(1-x/(IW*0.12))*0.48)){ctx.fillStyle=C.white;ctx.fillRect(x,y,1,1);}
+    for(let x=IW*0.88;x<IW;x+=2) for(let y=0;y<IH-12;y+=2)
+      if(dither(x,y,((x-IW*0.88)/(IW*0.12))*0.48)){ctx.fillStyle=C.white;ctx.fillRect(x,y,1,1);}
     drawStars(dt);
-    drawSun(frame*0.015);
+    drawSun(frame*0.012);
     drawCity();
     drawPackets(dt);
     drawSparks(dt);
-    drawHero(dt);
+    const bob=Math.sin(frame*0.04)*4;
+    drawFigure(HERO_X|0,(IH*0.44+bob)|0,frame*0.022);
     drawHUD();
     scanlines();
-
     requestAnimationFrame(loop);
   }
-
   requestAnimationFrame(loop);
 })();
