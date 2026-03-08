@@ -1,258 +1,192 @@
-/* ============================================================
-   HERO-ANIM.JS — MATRIX / GAME BOY / 1-BIT HERO SCENE
-   Drop-in replacement for your current hero animation
-   ============================================================ */
-(function () {
-  const canvas = document.getElementById('hero-canvas');
-  if (!canvas) return;
+const canvas = document.getElementById("hero-canvas");
+if (!canvas) throw new Error("Canvas #hero-canvas not found");
 
-  const ctx = canvas.getContext('2d', { alpha: false });
+const ctx = canvas.getContext("2d");
 
-  // Internal low-res buffer for sharp pixel scaling
-  const IW = 240;
-  const IH = 150;
+function resizeCanvas() {
+  const parent = canvas.parentElement;
+  canvas.width = parent ? parent.clientWidth : window.innerWidth;
+  canvas.height = 420;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-  canvas.width = IW;
-  canvas.height = IH;
-  canvas.style.imageRendering = 'pixelated';
-  canvas.style.imageRendering = 'crisp-edges';
+const hero = new Image();
+hero.src = "reda-hero.png"; // put your face image here
 
-  const C = {
-    bg: '#000000',
-    white: '#ffffff',
-    light: '#d9d9d9',
-    mid: '#8a8a8a',
-    dark: '#4b4b4b'
-  };
+ctx.imageSmoothingEnabled = false;
 
-  // 4x4 Bayer dither
-  const BAYER = [
-    0,  8,  2, 10,
-    12, 4, 14,  6,
-    3, 11,  1,  9,
-    15, 7, 13,  5
-  ];
+const rainDrops = [];
+const codeCols = [];
+const CODE_CHARS = "01アイウエオカキクケコサシスセソABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-  function dither(x, y, threshold) {
-    return (BAYER[(y & 3) * 4 + (x & 3)] / 16) < threshold;
+function randomChar() {
+  return CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
+}
+
+function initScene() {
+  rainDrops.length = 0;
+  codeCols.length = 0;
+
+  for (let i = 0; i < 140; i++) {
+    rainDrops.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      len: 8 + Math.random() * 18,
+      speed: 2 + Math.random() * 4,
+      drift: 0.6 + Math.random() * 1.2
+    });
   }
 
-  function px(x, y, color = C.white) {
-    ctx.fillStyle = color;
-    ctx.fillRect(x | 0, y | 0, 1, 1);
+  const spacing = 18;
+  for (let x = 0; x < canvas.width + spacing; x += spacing) {
+    codeCols.push({
+      x,
+      y: Math.random() * canvas.height - canvas.height,
+      speed: 1 + Math.random() * 2.2,
+      chars: Array.from({ length: 24 }, () => randomChar())
+    });
   }
+}
 
-  function rect(x, y, w, h, color = C.white) {
-    ctx.fillStyle = color;
-    ctx.fillRect(x | 0, y | 0, w | 0, h | 0);
-  }
+function drawBackgroundGradient() {
+  const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  g.addColorStop(0, "#000000");
+  g.addColorStop(1, "#050505");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
 
-  function ditherRect(x, y, w, h, threshold, color = C.white) {
-    for (let yy = 0; yy < h; yy++) {
-      for (let xx = 0; xx < w; xx++) {
-        if (dither(x + xx, y + yy, threshold)) {
-          px(x + xx, y + yy, color);
-        }
-      }
-    }
-  }
+function drawMovingCode(time) {
+  ctx.save();
+  ctx.font = "12px monospace";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
 
-  function outlineRect(x, y, w, h) {
-    rect(x, y, w, 1, C.white);
-    rect(x, y + h - 1, w, 1, C.white);
-    rect(x, y, 1, h, C.white);
-    rect(x + w - 1, y, 1, h, C.white);
-  }
-
-  let t = 0;
-  let rainOffset = 0;
-  let starTick = 0;
-  const stars = Array.from({ length: 18 }, () => ({
-    x: Math.random() * IW,
-    y: Math.random() * IH,
-    s: Math.random() > 0.5 ? 1 : 2
-  }));
-
-  function drawBackground() {
-    rect(0, 0, IW, IH, C.bg);
-
-    // Sparse stars
-    starTick += 0.02;
-    for (let i = 0; i < stars.length; i++) {
-      const s = stars[i];
-      if (((i + (starTick | 0)) % 3) !== 0) {
-        rect(s.x, s.y, s.s, 1, C.white);
+  for (const col of codeCols) {
+    for (let i = 0; i < col.chars.length; i++) {
+      const yy = col.y + i * 14;
+      if (yy > -20 && yy < canvas.height + 20) {
+        const flicker = ((time * 0.02 + i) % 7) < 1 ? "#d0d0d0" : "#6f6f6f";
+        ctx.fillStyle = i === col.chars.length - 1 ? "#ffffff" : flicker;
+        ctx.fillText(col.chars[i], col.x, yy);
       }
     }
 
-    // Diagonal rain streaks like your references
-    rainOffset = (rainOffset + 1.8) % 24;
+    col.y += col.speed;
 
-    for (let row = -20; row < IH + 20; row += 18) {
-      for (let col = -30; col < IW + 30; col += 28) {
-        const x = col + ((row / 18) % 2) * 8;
-        const y = row + rainOffset;
+    if (Math.random() < 0.03) {
+      const idx = Math.floor(Math.random() * col.chars.length);
+      col.chars[idx] = randomChar();
+    }
 
-        for (let k = 0; k < 8; k++) {
-          const rx = (x + k * 2) | 0;
-          const ry = (y + k * 2) | 0;
-          if (rx >= 0 && rx < IW && ry >= 0 && ry < IH) {
-            px(rx, ry, C.white);
-          }
-        }
-      }
+    if (col.y - col.chars.length * 14 > canvas.height) {
+      col.y = -Math.random() * 220 - 100;
+      col.speed = 1 + Math.random() * 2.2;
+      col.chars = Array.from({ length: 24 }, () => randomChar());
     }
   }
 
-  function drawLeftBeam(frame) {
-    const pulse = Math.sin(frame * 0.07) * 0.5 + 0.5;
+  ctx.restore();
+}
 
-    // Long beam / ship nose coming from left
-    for (let x = 0; x < 86; x++) {
-      const halfH = 18 - (x * 0.17);
-      const yMid = 95;
+function drawRain() {
+  ctx.save();
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 1;
 
-      for (let yy = -halfH; yy <= halfH; yy++) {
-        const pyy = (yMid + yy) | 0;
-        const pxx = x | 0;
+  for (const d of rainDrops) {
+    ctx.beginPath();
+    ctx.moveTo(d.x, d.y);
+    ctx.lineTo(d.x + d.len * 0.55, d.y + d.len);
+    ctx.stroke();
 
-        if (Math.abs(yy) < halfH - 1) {
-          const shade =
-            x < 20 ? 0.75 :
-            x < 45 ? 0.55 :
-            x < 70 ? 0.35 : 0.18;
+    d.y += d.speed;
+    d.x += d.drift;
 
-          if (dither(pxx, pyy, shade)) px(pxx, pyy, C.light);
-        } else {
-          px(pxx, pyy, C.white);
-        }
-      }
-    }
-
-    // Beam glow core
-    if (pulse > 0.45) {
-      rect(8, 94, 14, 2, C.white);
-    }
-
-    // Small spikes on top of nose
-    rect(4, 73, 2, 5, C.white);
-    rect(10, 69, 2, 9, C.white);
-    rect(17, 71, 2, 7, C.white);
-  }
-
-  function drawHero(frame) {
-    const bob = Math.sin(frame * 0.09) * 1.5;
-    const x = 150;
-    const y = 95 + bob;
-
-    // Cape / body silhouette
-    const bodyTop = y - 20;
-    const bodyBottom = y + 34;
-
-    for (let yy = bodyTop; yy <= bodyBottom; yy++) {
-      const p = (yy - bodyTop) / (bodyBottom - bodyTop);
-      const halfW = 10 + p * 22;
-
-      for (let xx = -halfW; xx <= halfW; xx++) {
-        const ax = x + xx;
-        const ay = yy;
-
-        const isEdge = Math.abs(xx) >= halfW - 1;
-
-        if (isEdge) {
-          px(ax, ay, C.white);
-        } else {
-          // strong dither gradient for the cloak/body
-          const shade =
-            p < 0.22 ? 0.15 :
-            p < 0.45 ? 0.28 :
-            p < 0.72 ? 0.42 : 0.58;
-
-          if (dither(ax, ay, shade)) px(ax, ay, C.mid);
-        }
-      }
-    }
-
-    // Chest circle / core
-    for (let yy = -6; yy <= 6; yy++) {
-      for (let xx = -6; xx <= 6; xx++) {
-        const dist = xx * xx + yy * yy;
-        const ax = x + 16 + xx;
-        const ay = y + 5 + yy;
-
-        if (dist <= 36 && dist >= 20) px(ax, ay, C.white);
-        if (dist < 20) px(ax, ay, C.bg);
-        if (dist < 5) px(ax, ay, C.white);
-      }
-    }
-
-    // Belt / panels
-    outlineRect(x - 12, y + 24, 10, 4);
-    outlineRect(x + 2, y + 24, 10, 4);
-    outlineRect(x + 16, y + 24, 10, 4);
-
-    // Neck connector
-    rect(x - 3, y - 27, 7, 12, C.dark);
-    rect(x - 2, y - 26, 5, 10, C.white);
-    rect(x - 1, y - 25, 3, 8, C.bg);
-
-    // Halo / ring
-    const ringY = y - 36;
-    for (let yy = -15; yy <= 15; yy++) {
-      for (let xx = -18; xx <= 18; xx++) {
-        const d = (xx * xx) / 1.6 + (yy * yy);
-        const ax = x + xx;
-        const ay = ringY + yy;
-
-        if (d <= 260 && d >= 120) {
-          const shade = xx > 0 ? 0.65 : 0.35;
-          if (dither(ax, ay, shade)) px(ax, ay, C.light);
-        }
-      }
-    }
-
-    // Head / mask
-    rect(x - 9, y - 24, 12, 14, C.white);
-    rect(x - 8, y - 23, 10, 12, C.bg);
-
-    // Face plate
-    rect(x - 7, y - 22, 8, 10, C.light);
-    ditherRect(x - 7, y - 22, 8, 10, 0.45, C.white);
-
-    // Eye
-    rect(x - 3, y - 18, 3, 3, C.white);
-
-    // Small front sensor
-    rect(x - 12, y - 18, 3, 5, C.white);
-    rect(x - 11, y - 17, 1, 3, C.bg);
-  }
-
-  function drawFlashLines(frame) {
-    // Faster streaks around the hero
-    const speed = (frame * 3) % 40;
-
-    for (let i = 0; i < 9; i++) {
-      const baseX = 150 + i * 10;
-      const baseY = 20 + ((i * 13 + speed) % 110);
-
-      for (let k = 0; k < 5; k++) {
-        const x = baseX + k * 2;
-        const y = baseY + k * 2;
-        if (x >= 0 && x < IW && y >= 0 && y < IH) px(x, y, C.white);
-      }
+    if (d.y > canvas.height + 20 || d.x > canvas.width + 20) {
+      d.y = -20 - Math.random() * 120;
+      d.x = Math.random() * canvas.width * 0.9;
     }
   }
 
-  function render() {
-    t++;
+  ctx.restore();
+}
 
-    drawBackground();
-    drawLeftBeam(t);
-    drawHero(t);
-    drawFlashLines(t);
+function drawVignette() {
+  const g = ctx.createRadialGradient(
+    canvas.width / 2,
+    canvas.height / 2,
+    40,
+    canvas.width / 2,
+    canvas.height / 2,
+    canvas.width * 0.55
+  );
+  g.addColorStop(0, "rgba(0,0,0,0)");
+  g.addColorStop(1, "rgba(0,0,0,0.55)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
 
-    requestAnimationFrame(render);
+function drawHero(time) {
+  if (!hero.complete) return;
+
+  const floatY = Math.sin(time * 0.002) * 6;
+  const swayX = Math.sin(time * 0.0012) * 4;
+
+  const baseSize = Math.min(canvas.width * 0.32, 260);
+  const w = baseSize;
+  const h = baseSize;
+
+  const x = canvas.width / 2 - w / 2 + swayX;
+  const y = canvas.height / 2 - h / 2 + floatY + 12;
+
+  // shadow glow behind portrait
+  const glow = ctx.createRadialGradient(
+    canvas.width / 2,
+    canvas.height / 2 + 10,
+    10,
+    canvas.width / 2,
+    canvas.height / 2 + 10,
+    170
+  );
+  glow.addColorStop(0, "rgba(255,255,255,0.10)");
+  glow.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(hero, x, y, w, h);
+  ctx.restore();
+}
+
+function drawScanlines() {
+  ctx.save();
+  ctx.fillStyle = "rgba(255,255,255,0.04)";
+  for (let y = 0; y < canvas.height; y += 4) {
+    ctx.fillRect(0, y, canvas.width, 1);
   }
+  ctx.restore();
+}
 
-  render();
-})();
+function animate(time) {
+  drawBackgroundGradient();
+  drawMovingCode(time);   // moving matrix code
+  drawRain();             // moving diagonal streaks
+  drawHero(time);         // your face image
+  drawVignette();
+  drawScanlines();
+
+  requestAnimationFrame(animate);
+}
+
+hero.onload = () => {
+  initScene();
+  animate(0);
+};
+
+window.addEventListener("resize", () => {
+  resizeCanvas();
+  initScene();
+});
