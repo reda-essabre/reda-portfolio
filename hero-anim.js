@@ -8,7 +8,6 @@
 
   const ctx = canvas.getContext("2d");
 
-  const HERO_HEIGHT = 480;
   const FONT_SIZE = 16;
   const COL_SPACING = 16;
   const CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*+-<>[]{}?/\\";
@@ -29,11 +28,11 @@
 
   function setupCanvas() {
     const dpr = window.devicePixelRatio || 1;
-    const width = window.innerWidth;
-    const height = HERO_HEIGHT;
+    const width = Math.max(1, canvas.clientWidth || canvas.parentElement?.clientWidth || window.innerWidth);
+    const height = Math.max(1, canvas.clientHeight || canvas.parentElement?.clientHeight || 320);
 
-    canvas.style.width = "100vw";
-    canvas.style.height = `${HERO_HEIGHT}px`;
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
     canvas.width = Math.floor(width * dpr);
     canvas.height = Math.floor(height * dpr);
 
