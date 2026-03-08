@@ -10,6 +10,13 @@
   const heroImage = new Image();
   let frameId = null;
   let ready = false;
+  const CELL = 12;
+  const matrix = {
+    cols: 0,
+    drops: [],
+    speeds: [],
+    chars: "01010100110101100101",
+  };
 
   function resizeCanvas() {
     const width = canvas.clientWidth || 320;
@@ -17,37 +24,40 @@
     if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
       canvas.height = height;
+      setupMatrix(width, height);
     }
   }
 
-  function drawAnimatedBackground(t, width, height) {
-    const g1x = width * (0.3 + Math.sin(t * 0.00035) * 0.18);
-    const g1y = height * (0.35 + Math.cos(t * 0.0003) * 0.16);
-    const g2x = width * (0.72 + Math.cos(t * 0.00028) * 0.2);
-    const g2y = height * (0.62 + Math.sin(t * 0.0004) * 0.14);
+  function setupMatrix(width, height) {
+    const cols = Math.ceil(width / CELL);
+    const rows = Math.ceil(height / CELL);
+    matrix.cols = cols;
+    matrix.drops = Array.from({ length: cols }, () => Math.floor(Math.random() * rows));
+    matrix.speeds = Array.from({ length: cols }, () => 0.55 + Math.random() * 0.9);
+  }
 
-    const gradient = ctx.createLinearGradient(0, 0, width, height);
-    gradient.addColorStop(0, "#061218");
-    gradient.addColorStop(0.45, "#102635");
-    gradient.addColorStop(1, "#1f455a");
-    ctx.fillStyle = gradient;
+  function drawAnimatedBackground(width, height) {
+    ctx.fillStyle = "rgba(0, 8, 0, 0.28)";
     ctx.fillRect(0, 0, width, height);
 
-    const orbA = ctx.createRadialGradient(g1x, g1y, 12, g1x, g1y, width * 0.45);
-    orbA.addColorStop(0, "rgba(120, 224, 255, 0.28)");
-    orbA.addColorStop(1, "rgba(120, 224, 255, 0)");
-    ctx.fillStyle = orbA;
-    ctx.fillRect(0, 0, width, height);
+    ctx.font = `bold ${CELL - 2}px monospace`;
+    ctx.textBaseline = "top";
+    for (let i = 0; i < matrix.cols; i++) {
+      const x = i * CELL;
+      const y = Math.floor(matrix.drops[i]) * CELL;
+      const char = matrix.chars[(Math.random() * matrix.chars.length) | 0];
 
-    const orbB = ctx.createRadialGradient(g2x, g2y, 8, g2x, g2y, width * 0.4);
-    orbB.addColorStop(0, "rgba(255, 210, 120, 0.2)");
-    orbB.addColorStop(1, "rgba(255, 210, 120, 0)");
-    ctx.fillStyle = orbB;
-    ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = "rgba(200,255,200,0.95)";
+      ctx.fillText(char, x, y);
 
-    ctx.fillStyle = "rgba(255,255,255,0.05)";
-    for (let y = ((t * 0.02) % 3); y < height; y += 3) {
-      ctx.fillRect(0, y, width, 1);
+      ctx.fillStyle = "rgba(40,255,100,0.75)";
+      ctx.fillText(char, x, y + CELL);
+
+      matrix.drops[i] += matrix.speeds[i];
+      if (y > height + Math.random() * 220) {
+        matrix.drops[i] = -((Math.random() * height) / CELL);
+        matrix.speeds[i] = 0.55 + Math.random() * 0.9;
+      }
     }
   }
 
@@ -57,34 +67,29 @@
     const height = canvas.height;
 
     ctx.clearRect(0, 0, width, height);
-    drawAnimatedBackground(performance.now(), width, height);
+    drawAnimatedBackground(width, height);
     ctx.imageSmoothingEnabled = true;
 
     const imgRatio = heroImage.width / heroImage.height;
     const canvasRatio = width / height;
-    const padding = Math.max(12, Math.round(Math.min(width, height) * 0.06));
-    const maxWidth = Math.max(1, width - padding * 2);
-    const maxHeight = Math.max(1, height - padding * 2);
-    let drawWidth = maxWidth;
-    let drawHeight = maxHeight;
+    let drawWidth = width;
+    let drawHeight = height;
     let offsetX = 0;
     let offsetY = 0;
 
     if (imgRatio > canvasRatio) {
-      drawWidth = maxWidth;
-      drawHeight = maxWidth / imgRatio;
-      offsetY = (height - drawHeight) / 2;
-    } else {
-      drawHeight = maxHeight;
-      drawWidth = maxHeight * imgRatio;
+      drawHeight = height;
+      drawWidth = height * imgRatio;
       offsetX = (width - drawWidth) / 2;
+    } else {
+      drawWidth = width;
+      drawHeight = width / imgRatio;
+      offsetY = (height - drawHeight) / 2;
     }
 
-    ctx.shadowColor = "rgba(0,0,0,0.45)";
-    ctx.shadowBlur = 24;
-    ctx.shadowOffsetY = 8;
+    ctx.globalAlpha = 0.9;
     ctx.drawImage(heroImage, offsetX, offsetY, drawWidth, drawHeight);
-    ctx.shadowColor = "transparent";
+    ctx.globalAlpha = 1;
   }
 
   function tick() {
