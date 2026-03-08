@@ -104,7 +104,7 @@
   }
 
   // ── PACKETS (floating signals to collect) ─────────────────
-  const PKTS = Array.from({length:5},(,i)=>({
+  const PKTS = Array.from({length:5},(_,i)=>({
     wx: 60+i*88, // world x
     wy: 60+Math.sin(i*1.4)*30,
     t:  i*0.7,
