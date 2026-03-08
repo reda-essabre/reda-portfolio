@@ -12,9 +12,12 @@
   const FONT_SIZE = 16;
   const COL_SPACING = 16;
   const CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*+-<>[]{}?/\\";
+  const HERO_IMAGE_SRC = "reda-hero.png";
 
   const columns = [];
   const streaks = [];
+  const heroImage = new Image();
+  let heroReady = false;
 
   function rand(min, max) {
     return min + Math.random() * (max - min);
@@ -140,6 +143,29 @@
     ctx.fillRect(0, 0, width, height);
   }
 
+  function drawHeroImage(width, height) {
+    if (!heroReady) return;
+
+    const imgRatio = heroImage.width / heroImage.height;
+    const canvasRatio = width / height;
+    let drawWidth = width;
+    let drawHeight = height;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (imgRatio > canvasRatio) {
+      drawWidth = width;
+      drawHeight = width / imgRatio;
+      offsetY = (height - drawHeight) / 2;
+    } else {
+      drawHeight = height;
+      drawWidth = height * imgRatio;
+      offsetX = (width - drawWidth) / 2;
+    }
+
+    ctx.drawImage(heroImage, offsetX, offsetY, drawWidth, drawHeight);
+  }
+
   function frame() {
     const width = canvas.width / (window.devicePixelRatio || 1);
     const height = canvas.height / (window.devicePixelRatio || 1);
@@ -149,6 +175,7 @@
 
     drawMatrixRain(width, height);
     drawDiagonalStreaks(width, height);
+    drawHeroImage(width, height);
     drawCrtOverlay(width, height);
     drawVignette(width, height);
 
@@ -156,6 +183,10 @@
   }
 
   window.addEventListener("resize", setupCanvas);
+  heroImage.onload = function () {
+    heroReady = true;
+  };
+  heroImage.src = HERO_IMAGE_SRC;
   setupCanvas();
   requestAnimationFrame(frame);
 })();
