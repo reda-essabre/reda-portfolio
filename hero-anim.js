@@ -10,12 +10,12 @@
   const heroImage = new Image();
   let frameId = null;
   let ready = false;
-  const CELL = 12;
+  const CELL = 20;
   const matrix = {
     cols: 0,
     drops: [],
     speeds: [],
-    chars: "01010100110101100101",
+    chars: "0123456789天地玄黄宇宙洪荒日月盈昃辰宿列张山川异域风月同天龙虎凤云火水木金土",
   };
 
   function resizeCanvas() {
@@ -33,30 +33,30 @@
     const rows = Math.ceil(height / CELL);
     matrix.cols = cols;
     matrix.drops = Array.from({ length: cols }, () => Math.floor(Math.random() * rows));
-    matrix.speeds = Array.from({ length: cols }, () => 0.55 + Math.random() * 0.9);
+    matrix.speeds = Array.from({ length: cols }, () => 0.12 + Math.random() * 0.22);
   }
 
   function drawAnimatedBackground(width, height) {
-    ctx.fillStyle = "rgba(0, 8, 0, 0.28)";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.22)";
     ctx.fillRect(0, 0, width, height);
 
-    ctx.font = `bold ${CELL - 2}px monospace`;
+    ctx.font = `bold ${CELL - 1}px monospace`;
     ctx.textBaseline = "top";
     for (let i = 0; i < matrix.cols; i++) {
       const x = i * CELL;
       const y = Math.floor(matrix.drops[i]) * CELL;
       const char = matrix.chars[(Math.random() * matrix.chars.length) | 0];
 
-      ctx.fillStyle = "rgba(200,255,200,0.95)";
+      ctx.fillStyle = "rgba(255,255,255,0.98)";
       ctx.fillText(char, x, y);
 
-      ctx.fillStyle = "rgba(40,255,100,0.75)";
+      ctx.fillStyle = "rgba(255,255,255,0.7)";
       ctx.fillText(char, x, y + CELL);
 
       matrix.drops[i] += matrix.speeds[i];
       if (y > height + Math.random() * 220) {
         matrix.drops[i] = -((Math.random() * height) / CELL);
-        matrix.speeds[i] = 0.55 + Math.random() * 0.9;
+        matrix.speeds[i] = 0.12 + Math.random() * 0.22;
       }
     }
   }
@@ -70,26 +70,8 @@
     drawAnimatedBackground(width, height);
     ctx.imageSmoothingEnabled = true;
 
-    const imgRatio = heroImage.width / heroImage.height;
-    const canvasRatio = width / height;
-    let drawWidth = width;
-    let drawHeight = height;
-    let offsetX = 0;
-    let offsetY = 0;
-
-    if (imgRatio > canvasRatio) {
-      drawHeight = height;
-      drawWidth = height * imgRatio;
-      offsetX = (width - drawWidth) / 2;
-    } else {
-      drawWidth = width;
-      drawHeight = width / imgRatio;
-      offsetY = (height - drawHeight) / 2;
-    }
-
-    ctx.globalAlpha = 0.9;
-    ctx.drawImage(heroImage, offsetX, offsetY, drawWidth, drawHeight);
     ctx.globalAlpha = 1;
+    ctx.drawImage(heroImage, 0, 0, width, height);
   }
 
   function tick() {
