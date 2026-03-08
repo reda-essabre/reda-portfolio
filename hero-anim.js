@@ -10,7 +10,7 @@
   const heroImage = new Image();
   let frameId = null;
   let ready = false;
-  const CELL = 20;
+  const CELL = 7;
   const matrix = {
     cols: 0,
     drops: [],
@@ -36,21 +36,23 @@
     matrix.speeds = Array.from({ length: cols }, () => 0.12 + Math.random() * 0.22);
   }
 
-  function drawAnimatedBackground(width, height) {
+  function drawAnimatedBackground(width, height, t) {
     ctx.fillStyle = "rgba(0, 0, 0, 0.22)";
     ctx.fillRect(0, 0, width, height);
 
     ctx.font = `bold ${CELL - 1}px monospace`;
     ctx.textBaseline = "top";
+    const hueA = (t * 0.02) % 360;
+    const hueB = (hueA + 50) % 360;
     for (let i = 0; i < matrix.cols; i++) {
       const x = i * CELL;
       const y = Math.floor(matrix.drops[i]) * CELL;
       const char = matrix.chars[(Math.random() * matrix.chars.length) | 0];
 
-      ctx.fillStyle = "rgba(255,255,255,0.98)";
+      ctx.fillStyle = `hsla(${hueA}, 95%, 82%, 0.95)`;
       ctx.fillText(char, x, y);
 
-      ctx.fillStyle = "rgba(255,255,255,0.7)";
+      ctx.fillStyle = `hsla(${hueB}, 100%, 70%, 0.72)`;
       ctx.fillText(char, x, y + CELL);
 
       matrix.drops[i] += matrix.speeds[i];
@@ -67,11 +69,29 @@
     const height = canvas.height;
 
     ctx.clearRect(0, 0, width, height);
-    drawAnimatedBackground(width, height);
+    drawAnimatedBackground(width, height, performance.now());
     ctx.imageSmoothingEnabled = true;
 
+    const imgRatio = heroImage.width / heroImage.height;
+    const canvasRatio = width / height;
+    let drawWidth = width;
+    let drawHeight = height;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    // Keep original image proportions (no stretching).
+    if (imgRatio > canvasRatio) {
+      drawWidth = width;
+      drawHeight = width / imgRatio;
+      offsetY = (height - drawHeight) / 2;
+    } else {
+      drawHeight = height;
+      drawWidth = height * imgRatio;
+      offsetX = (width - drawWidth) / 2;
+    }
+
     ctx.globalAlpha = 1;
-    ctx.drawImage(heroImage, 0, 0, width, height);
+    ctx.drawImage(heroImage, offsetX, offsetY, drawWidth, drawHeight);
   }
 
   function tick() {
