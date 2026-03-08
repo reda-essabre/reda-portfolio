@@ -472,20 +472,31 @@
     ctx.beginPath(); ctx.moveTo(6,-56); ctx.lineTo(8,-60); ctx.stroke();
     ctx.restore();
 
-    // Chest S-style emblem (sun mark)
-    ctx.fillStyle=C.bg;
-    ctx.strokeStyle=C.white; ctx.lineWidth=lw;
-    ctx.beginPath(); ctx.arc(0,-18,6,0,Math.PI*2);
+    // CHEST EMBLEM: PLAY ARROW — always moving, always running
+    ctx.save();
+    ctx.translate(0, -18);
+    // Outer circle
+    ctx.fillStyle = C.bg;
+    ctx.strokeStyle = C.white;
+    ctx.lineWidth = lw;
+    ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI*2);
     ctx.fill(); ctx.stroke();
-    // Rotating sun mark
-    const rot=frame*0.025;
-    ctx.save(); ctx.translate(0,-18);
-    ctx.strokeStyle=C.amber; ctx.lineWidth=1;
-    for(let i=0;i<8;i++){
-      const a=i/8*Math.PI*2+rot;
-      ctx.beginPath(); ctx.moveTo(Math.cos(a)*4,Math.sin(a)*4);
-      ctx.lineTo(Math.cos(a)*7,Math.sin(a)*7); ctx.stroke();
-    }
+    // Breathing pulse ring
+    const pulse = 0.4 + 0.6*Math.abs(Math.sin(frame*0.06));
+    ctx.save();
+    ctx.globalAlpha = pulse * 0.55;
+    ctx.strokeStyle = C.amber; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(0, 0, 10 + pulse*2, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+    // Solid amber triangle pointing right
+    ctx.fillStyle = C.amber;
+    ctx.beginPath();
+    ctx.moveTo(-3, -4);
+    ctx.lineTo( 5,  0);
+    ctx.lineTo(-3,  4);
+    ctx.closePath();
+    ctx.fill();
     ctx.restore();
 
     ctx.restore(); // untranslate
