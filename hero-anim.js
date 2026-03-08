@@ -1,192 +1,273 @@
-const canvas = document.getElementById("hero-canvas");
-if (!canvas) throw new Error("Canvas #hero-canvas not found");
-
-const ctx = canvas.getContext("2d");
-
-function resizeCanvas() {
-  const parent = canvas.parentElement;
-  canvas.width = parent ? parent.clientWidth : window.innerWidth;
-  canvas.height = 420;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-
-const hero = new Image();
-hero.src = "reda-hero.png"; // put your face image here
-
-ctx.imageSmoothingEnabled = false;
-
-const rainDrops = [];
-const codeCols = [];
-const CODE_CHARS = "01アイウエオカキクケコサシスセソABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-function randomChar() {
-  return CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
-}
-
-function initScene() {
-  rainDrops.length = 0;
-  codeCols.length = 0;
-
-  for (let i = 0; i < 140; i++) {
-    rainDrops.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      len: 8 + Math.random() * 18,
-      speed: 2 + Math.random() * 4,
-      drift: 0.6 + Math.random() * 1.2
-    });
+(() => {
+  const canvas = document.getElementById("hero-canvas");
+  if (!canvas) {
+    console.error("hero-canvas not found");
+    return;
   }
 
-  const spacing = 18;
-  for (let x = 0; x < canvas.width + spacing; x += spacing) {
-    codeCols.push({
-      x,
-      y: Math.random() * canvas.height - canvas.height,
-      speed: 1 + Math.random() * 2.2,
-      chars: Array.from({ length: 24 }, () => randomChar())
-    });
+  const ctx = canvas.getContext("2d", { alpha: false });
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  const IMAGE_PATH = "reda-hero.png";
+
+  const heroImg = new Image();
+  heroImg.src = IMAGE_PATH;
+
+  let w = 0;
+  let h = 0;
+
+  const codeColumns = [];
+  const rainLines = [];
+  const glyphs = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*+=-<>[]{}";
+  let time = 0;
+
+  function resize() {
+    const parent = canvas.parentElement || canvas;
+    const cssW = parent.clientWidth || 900;
+    const cssH = 420;
+
+    canvas.style.width = cssW + "px";
+    canvas.style.height = cssH + "px";
+
+    canvas.width = Math.floor(cssW * DPR);
+    canvas.height = Math.floor(cssH * DPR);
+
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    w = cssW;
+    h = cssH;
+
+    initBackground();
   }
-}
 
-function drawBackgroundGradient() {
-  const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  g.addColorStop(0, "#000000");
-  g.addColorStop(1, "#050505");
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-}
+  function rand(min, max) {
+    return Math.random() * (max - min) + min;
+  }
 
-function drawMovingCode(time) {
-  ctx.save();
-  ctx.font = "12px monospace";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "top";
+  function pick(str) {
+    return str[(Math.random() * str.length) | 0];
+  }
 
-  for (const col of codeCols) {
-    for (let i = 0; i < col.chars.length; i++) {
-      const yy = col.y + i * 14;
-      if (yy > -20 && yy < canvas.height + 20) {
-        const flicker = ((time * 0.02 + i) % 7) < 1 ? "#d0d0d0" : "#6f6f6f";
-        ctx.fillStyle = i === col.chars.length - 1 ? "#ffffff" : flicker;
-        ctx.fillText(col.chars[i], col.x, yy);
+  function initBackground() {
+    codeColumns.length = 0;
+    rainLines.length = 0;
+
+    const colGap = 18;
+    const count = Math.ceil(w / colGap) + 2;
+
+    for (let i = 0; i < count; i++) {
+      codeColumns.push({
+        x: i * colGap,
+        y: rand(-h, 0),
+        speed: rand(1.4, 3.4),
+        length: (rand(12, 26)) | 0,
+        chars: Array.from({ length: 28 }, () => pick(glyphs))
+      });
+    }
+
+    for (let i = 0; i < 120; i++) {
+      rainLines.push({
+        x: rand(0, w),
+        y: rand(0, h),
+        len: rand(8, 24),
+        speed: rand(4, 10),
+        drift: rand(1.2, 2.8)
+      });
+    }
+  }
+
+  function drawBackground() {
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, w, h);
+
+    // moving matrix columns
+    ctx.font = "12px monospace";
+    ctx.textBaseline = "top";
+
+    for (const col of codeColumns) {
+      for (let i = 0; i < col.length; i++) {
+        const yy = col.y + i * 14;
+        if (yy < -20 || yy > h + 20) continue;
+
+        let shade = "#4a4a4a";
+        if (i > col.length - 4) shade = "#bfbfbf";
+        if (i === col.length - 1) shade = "#ffffff";
+
+        ctx.fillStyle = shade;
+        ctx.fillText(col.chars[i % col.chars.length], col.x, yy);
+      }
+
+      col.y += col.speed;
+
+      if (Math.random() < 0.08) {
+        const idx = (Math.random() * col.chars.length) | 0;
+        col.chars[idx] = pick(glyphs);
+      }
+
+      if (col.y - col.length * 14 > h) {
+        col.y = rand(-160, -40);
+        col.speed = rand(1.4, 3.4);
+        col.length = (rand(12, 26)) | 0;
       }
     }
 
-    col.y += col.speed;
+    // diagonal streaks like the gif
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 1;
 
-    if (Math.random() < 0.03) {
-      const idx = Math.floor(Math.random() * col.chars.length);
-      col.chars[idx] = randomChar();
-    }
+    for (const r of rainLines) {
+      ctx.beginPath();
+      ctx.moveTo(r.x, r.y);
+      ctx.lineTo(r.x + r.len * 0.55, r.y + r.len);
+      ctx.stroke();
 
-    if (col.y - col.chars.length * 14 > canvas.height) {
-      col.y = -Math.random() * 220 - 100;
-      col.speed = 1 + Math.random() * 2.2;
-      col.chars = Array.from({ length: 24 }, () => randomChar());
-    }
-  }
+      r.x += r.drift;
+      r.y += r.speed;
 
-  ctx.restore();
-}
-
-function drawRain() {
-  ctx.save();
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 1;
-
-  for (const d of rainDrops) {
-    ctx.beginPath();
-    ctx.moveTo(d.x, d.y);
-    ctx.lineTo(d.x + d.len * 0.55, d.y + d.len);
-    ctx.stroke();
-
-    d.y += d.speed;
-    d.x += d.drift;
-
-    if (d.y > canvas.height + 20 || d.x > canvas.width + 20) {
-      d.y = -20 - Math.random() * 120;
-      d.x = Math.random() * canvas.width * 0.9;
+      if (r.y > h + 30 || r.x > w + 30) {
+        r.x = rand(-40, w * 0.7);
+        r.y = rand(-140, -20);
+      }
     }
   }
 
-  ctx.restore();
-}
+  function drawPixelPortrait(img, t) {
+    if (!img.complete || !img.naturalWidth) return;
 
-function drawVignette() {
-  const g = ctx.createRadialGradient(
-    canvas.width / 2,
-    canvas.height / 2,
-    40,
-    canvas.width / 2,
-    canvas.height / 2,
-    canvas.width * 0.55
-  );
-  g.addColorStop(0, "rgba(0,0,0,0)");
-  g.addColorStop(1, "rgba(0,0,0,0.55)");
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-}
+    const floatY = Math.sin(t * 0.0018) * 6;
+    const swayX = Math.sin(t * 0.0012) * 4;
 
-function drawHero(time) {
-  if (!hero.complete) return;
+    // portrait area: large and centered, using most of the frame
+    const targetW = Math.min(w * 0.62, 520);
+    const targetH = h * 0.9;
+    const dx = (w - targetW) * 0.5 + swayX;
+    const dy = (h - targetH) * 0.5 + floatY;
 
-  const floatY = Math.sin(time * 0.002) * 6;
-  const swayX = Math.sin(time * 0.0012) * 4;
+    // create offscreen tiny version to force blocky look
+    const pixelScale = 7; // bigger = chunkier blocks
+    const smallW = Math.max(36, Math.floor(targetW / pixelScale));
+    const smallH = Math.max(48, Math.floor(targetH / pixelScale));
 
-  const baseSize = Math.min(canvas.width * 0.32, 260);
-  const w = baseSize;
-  const h = baseSize;
+    const off = document.createElement("canvas");
+    off.width = smallW;
+    off.height = smallH;
+    const octx = off.getContext("2d", { willReadFrequently: true });
 
-  const x = canvas.width / 2 - w / 2 + swayX;
-  const y = canvas.height / 2 - h / 2 + floatY + 12;
+    octx.imageSmoothingEnabled = false;
 
-  // shadow glow behind portrait
-  const glow = ctx.createRadialGradient(
-    canvas.width / 2,
-    canvas.height / 2 + 10,
-    10,
-    canvas.width / 2,
-    canvas.height / 2 + 10,
-    170
-  );
-  glow.addColorStop(0, "rgba(255,255,255,0.10)");
-  glow.addColorStop(1, "rgba(255,255,255,0)");
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // cover crop so the portrait uses the frame well
+    const imgRatio = img.naturalWidth / img.naturalHeight;
+    const boxRatio = smallW / smallH;
 
-  ctx.save();
-  ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(hero, x, y, w, h);
-  ctx.restore();
-}
+    let sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight;
 
-function drawScanlines() {
-  ctx.save();
-  ctx.fillStyle = "rgba(255,255,255,0.04)";
-  for (let y = 0; y < canvas.height; y += 4) {
-    ctx.fillRect(0, y, canvas.width, 1);
+    if (imgRatio > boxRatio) {
+      sw = img.naturalHeight * boxRatio;
+      sx = (img.naturalWidth - sw) * 0.5;
+    } else {
+      sh = img.naturalWidth / boxRatio;
+      sy = (img.naturalHeight - sh) * 0.38; // bias upward toward face
+    }
+
+    octx.drawImage(img, sx, sy, sw, sh, 0, 0, smallW, smallH);
+
+    // grayscale + hard posterize
+    const imageData = octx.getImageData(0, 0, smallW, smallH);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+
+      let gray = 0.299 * r + 0.587 * g + 0.114 * b;
+
+      // boost contrast
+      gray = gray < 70 ? 0 : gray < 120 ? 85 : gray < 180 ? 170 : 255;
+
+      data[i] = gray;
+      data[i + 1] = gray;
+      data[i + 2] = gray;
+    }
+
+    octx.putImageData(imageData, 0, 0);
+
+    // glow behind face
+    const glow = ctx.createRadialGradient(
+      w * 0.5,
+      h * 0.5,
+      20,
+      w * 0.5,
+      h * 0.5,
+      Math.max(targetW, targetH) * 0.55
+    );
+    glow.addColorStop(0, "rgba(255,255,255,0.14)");
+    glow.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, w, h);
+
+    // draw pixel portrait scaled up
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(off, dx, dy, targetW, targetH);
+    ctx.restore();
+
+    // subtle black fade on lower part so it feels cinematic
+    const fade = ctx.createLinearGradient(0, dy + targetH * 0.65, 0, dy + targetH);
+    fade.addColorStop(0, "rgba(0,0,0,0)");
+    fade.addColorStop(1, "rgba(0,0,0,0.55)");
+    ctx.fillStyle = fade;
+    ctx.fillRect(dx, dy, targetW, targetH);
   }
-  ctx.restore();
-}
 
-function animate(time) {
-  drawBackgroundGradient();
-  drawMovingCode(time);   // moving matrix code
-  drawRain();             // moving diagonal streaks
-  drawHero(time);         // your face image
-  drawVignette();
-  drawScanlines();
+  function drawScanlines() {
+    ctx.fillStyle = "rgba(255,255,255,0.05)";
+    for (let y = 0; y < h; y += 4) {
+      ctx.fillRect(0, y, w, 1);
+    }
+  }
 
-  requestAnimationFrame(animate);
-}
+  function drawVignette() {
+    const g = ctx.createRadialGradient(
+      w * 0.5,
+      h * 0.45,
+      60,
+      w * 0.5,
+      h * 0.5,
+      w * 0.7
+    );
+    g.addColorStop(0, "rgba(0,0,0,0)");
+    g.addColorStop(1, "rgba(0,0,0,0.75)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+  }
 
-hero.onload = () => {
-  initScene();
-  animate(0);
-};
+  function render(ts) {
+    time = ts;
 
-window.addEventListener("resize", () => {
-  resizeCanvas();
-  initScene();
-});
+    drawBackground();
+    drawPixelPortrait(heroImg, ts);
+    drawVignette();
+    drawScanlines();
+
+    requestAnimationFrame(render);
+  }
+
+  heroImg.onload = () => {
+    console.log("Hero image loaded:", IMAGE_PATH);
+    resize();
+    requestAnimationFrame(render);
+  };
+
+  heroImg.onerror = () => {
+    console.error("Failed to load image:", IMAGE_PATH);
+    resize();
+    drawBackground();
+    ctx.fillStyle = "#fff";
+    ctx.font = "16px monospace";
+    ctx.fillText("Image not found: " + IMAGE_PATH, 20, 40);
+  };
+
+  window.addEventListener("resize", resize);
+  resize();
+})();
