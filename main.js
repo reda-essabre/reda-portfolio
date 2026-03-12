@@ -8,10 +8,11 @@ function initTerminal() {
   if (!out) return;
 
   const lines = [
-    'SYSTEM: data automation layer online.',
-    'STATUS: accepting engagements [france/remote].',
-    'MODULES: sql · rules · pipelines · ai-ops.',
-    'DIRECTIVE: if human repeats task > 2x, automate.',
+    'SYSTEM: data engineering layer online.',
+    'STACK: sql · ssrs · apis · rule-engines · fastapi · n8n.',
+    'STATUS: open for consulting engagements [paris / remote].',
+    'DIRECTIVE: if a human repeats a task > 2x — automate it.',
+    'RECOGNITION: q2-2023 leadership unsung hero — europe.',
     'CONTACT: open channel at /contact',
   ];
 
@@ -76,7 +77,6 @@ function initTerminal() {
 // ---- SUBTLE RANDOM PIXEL FLICKER on dither blocks ----
 (function () {
   // Very occasional single pixel flicker for atmosphere
-  let canvas = null;
   function addAtmosphere() {
     const els = document.querySelectorAll('.stat-block, .skill-tile');
     els.forEach(el => {

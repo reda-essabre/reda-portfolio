@@ -1430,6 +1430,104 @@ footer {
 }
 
 /* ============================================================
+   IMPACT / RECOGNITION SECTION
+   ============================================================ */
+.impact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 3px solid var(--paper);
+}
+
+.award-block {
+  border-right: 3px solid var(--paper);
+  padding: 2rem;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 5px 5px;
+  position: relative;
+}
+
+.award-badge-label {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 0.75rem;
+}
+
+.award-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.5vw, 2rem);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--paper);
+  line-height: 1.05;
+  margin-bottom: 0.4rem;
+}
+
+.award-sub {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 1.5rem;
+}
+
+.award-quote {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.8;
+  border-left: 2px solid var(--amber);
+  padding-left: 1rem;
+  font-style: italic;
+}
+
+.impact-metrics {
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+}
+
+.impact-metric {
+  padding: 1.2rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.impact-metric:last-child { border-bottom: none; }
+
+.impact-num {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 900;
+  color: var(--paper);
+  white-space: nowrap;
+  min-width: 5.5rem;
+  letter-spacing: -0.02em;
+}
+
+.impact-desc {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .impact-grid { grid-template-columns: 1fr; }
+  .award-block { border-right: none; border-bottom: 3px solid var(--paper); }
+}
+
+/* ============================================================
    GAME PAGE SPECIFICS
    ============================================================ */
 .game-wrap {
