@@ -1564,6 +1564,9 @@ footer {
 @media (max-width: 900px) {
   .impact-grid { grid-template-columns: 1fr; }
   .award-block { border-right: none; border-bottom: 3px solid var(--paper); }
+  .impact-metrics { padding: 1.25rem 1.25rem; }
+  .impact-metric { gap: 1rem; }
+  .impact-num { min-width: 4.5rem; font-size: 1.6rem; }
 }
 
 /* ============================================================
@@ -1646,8 +1649,23 @@ footer {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 900px) {
-  .hero-inner { grid-template-columns: 1fr; }
-  .hero-art { display: none; }
+  .container { padding: 0 1rem; }
+  .hero { padding: 3.5rem 0 3rem; }
+  .hero::after { width: 100%; background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.12) 45%, rgba(0,0,0,0) 100%); }
+  .hero-inner { grid-template-columns: 1fr; gap: 2rem; }
+  .hero-copy { max-width: none; }
+  .hero h1 { font-size: clamp(3rem, 10vw, 5rem); margin-bottom: 1.1rem; }
+  .hero h1 .name-block { margin-bottom: 0.55rem; letter-spacing: 0.06em; }
+  .hero h1 .role-block { max-width: 100%; font-size: 0.3em; letter-spacing: 0.12em; }
+  .hero-desc { max-width: 100%; font-size: 0.88rem; margin-bottom: 1.8rem; }
+  .hero-art {
+    display: block;
+    height: 380px;
+    max-width: 620px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .hero-art-label { font-size: 0.5rem; letter-spacing: 0.18em; }
   .resume-layout { grid-template-columns: 1fr; }
   .resume-sidebar { border-top: 3px solid var(--paper); }
   .contact-layout { grid-template-columns: 1fr; }
@@ -1657,16 +1675,58 @@ footer {
   .stats-strip { grid-template-columns: repeat(2, 1fr); }
   .stat-block:nth-child(2) { border-right: none; }
   .stat-block:nth-child(1), .stat-block:nth-child(2) { border-bottom: 3px solid var(--paper); }
+  .case-grid { grid-template-columns: 1fr; }
+  .case-card { border-right: none; }
 }
 
 @media (max-width: 600px) {
   .header-inner { flex-wrap: wrap; }
-  nav { width: 100%; border-top: 2px solid rgba(255,255,255,0.1); }
-  nav a { flex: 1; justify-content: center; padding: 0.6rem 0.4rem; font-size: 0.55rem; }
+  .logo { width: 100%; border-right: none; border-bottom: 2px solid rgba(255,255,255,0.1); padding: 0.85rem 1rem; }
+  .logo-text { font-size: 0.56rem; }
+  nav {
+    width: 100%;
+    border-top: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  nav a {
+    justify-content: center;
+    padding: 0.85rem 0.45rem;
+    font-size: 0.52rem;
+    min-height: 52px;
+  }
+  .hero { padding: 2.75rem 0 2.5rem; }
+  .hero-badge { font-size: 0.5rem; letter-spacing: 0.18em; margin-bottom: 0.95rem; }
+  .hero h1 { font-size: clamp(2.3rem, 14vw, 3.8rem); line-height: 0.94; }
+  .hero h1 .name-block { letter-spacing: 0.05em; margin-bottom: 0.45rem; }
+  .hero h1 .role-block { font-size: 0.34em; letter-spacing: 0.09em; color: rgba(255,255,255,0.68); }
+  .hero-desc { font-size: 0.78rem; line-height: 1.8; margin-bottom: 1.5rem; }
+  .hero-ctas { gap: 0.65rem; }
+  .hero-ctas .btn { width: 100%; justify-content: center; }
+  .hero-art {
+    height: 300px;
+    border-width: 2px;
+  }
+  .hero-art::before { inset: 6px; }
+  .hero-art-label {
+    padding: 0.6rem 0.7rem;
+    font-size: 0.44rem;
+    letter-spacing: 0.12em;
+  }
   .skills-grid { grid-template-columns: 1fr; }
   .skill-tile:nth-child(even) { border-right: 3px solid var(--paper); }
   .skill-tile:nth-child(n+3) { border-bottom: 3px solid var(--paper); }
   .skill-tile:last-child { border-bottom: none; }
+  .stats-strip { grid-template-columns: 1fr; }
+  .stat-block { border-right: none; border-bottom: 3px solid var(--paper); }
+  .stat-block:last-child { border-bottom: none; }
+  .impact-metric { flex-direction: column; align-items: flex-start; gap: 0.55rem; }
+  .impact-num { min-width: 0; }
+  .award-block, .impact-metrics { padding: 1.1rem; }
+  .case-grid { grid-template-columns: 1fr; }
+  .case-card { border-right: none; }
+  .case-flow { grid-template-columns: 1fr; }
+  .case-flow-arrow { display: none; }
   .footer-inner { grid-template-columns: 1fr; }
   .footer-brand { border-right: none; border-bottom: 3px solid var(--paper); }
   .footer-nav { border-left: none; border-top: 3px solid var(--paper); flex-direction: row; flex-wrap: wrap; gap: 0.75rem; }
