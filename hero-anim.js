@@ -152,48 +152,24 @@
 
     const imgRatio = heroImage.width / heroImage.height;
     const canvasRatio = width / height;
-    let drawWidth;
-    let drawHeight;
+    let drawWidth = width;
+    let drawHeight = height;
+    let offsetX = 0;
+    let offsetY = 0;
 
     if (imgRatio > canvasRatio) {
-      drawHeight = height * 0.98;
-      drawWidth = drawHeight * imgRatio;
+      drawWidth = width;
+      drawHeight = width / imgRatio;
+      offsetY = (height - drawHeight) / 2;
     } else {
-      drawWidth = width * 0.98;
-      drawHeight = drawWidth / imgRatio;
+      drawHeight = height;
+      drawWidth = height * imgRatio;
+      offsetX = (width - drawWidth) / 2;
     }
 
-    const offsetX = width - drawWidth - width * 0.05;
-    const offsetY = (height - drawHeight) * 0.5 - height * 0.015;
-
-    ctx.save();
-    ctx.filter = "grayscale(1) contrast(1.18) brightness(0.9)";
-    ctx.globalAlpha = 0.96;
+    ctx.globalAlpha = 0.98;
     ctx.drawImage(heroImage, offsetX, offsetY, drawWidth, drawHeight);
-    ctx.restore();
-
-    ctx.save();
-    ctx.globalCompositeOperation = "multiply";
-    const shadow = ctx.createLinearGradient(0, 0, width, 0);
-    shadow.addColorStop(0, "rgba(0,0,0,0)");
-    shadow.addColorStop(0.45, "rgba(0,0,0,0.12)");
-    shadow.addColorStop(1, "rgba(0,0,0,0.34)");
-    ctx.fillStyle = shadow;
-    ctx.fillRect(0, 0, width, height);
-    ctx.restore();
-
-    ctx.save();
-    ctx.strokeStyle = "rgba(255,255,255,0.14)";
-    ctx.lineWidth = 1;
-    ctx.strokeRect(width * 0.08, height * 0.12, width * 0.84, height * 0.72);
-    ctx.strokeStyle = "rgba(255,255,255,0.06)";
-    ctx.beginPath();
-    ctx.moveTo(width * 0.12, height * 0.22);
-    ctx.lineTo(width * 0.88, height * 0.22);
-    ctx.moveTo(width * 0.12, height * 0.74);
-    ctx.lineTo(width * 0.88, height * 0.74);
-    ctx.stroke();
-    ctx.restore();
+    ctx.globalAlpha = 1;
   }
 
   function frame() {
