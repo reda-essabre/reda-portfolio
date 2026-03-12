@@ -7,9 +7,11 @@
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
+  const label = document.querySelector(".hero-art-label span");
+  const signalCount = document.getElementById("hero-signal-count");
 
-  const FONT_SIZE = 16;
-  const COL_SPACING = 16;
+  const FONT_SIZE = 14;
+  const COL_SPACING = 18;
   const CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*+-<>[]{}?/\\";
   const HERO_IMAGE_SRC = "reda-hero.png";
 
@@ -17,6 +19,9 @@
   const streaks = [];
   const heroImage = new Image();
   let heroReady = false;
+
+  if (label) label.textContent = "RE / VISUAL CONSOLE";
+  if (signalCount) signalCount.textContent = "PORTRAIT ACTIVE";
 
   function rand(min, max) {
     return min + Math.random() * (max - min);
@@ -48,7 +53,7 @@
       columns.push({
         x: i * COL_SPACING,
         y: rand(-height, 0),
-        speed: rand(2, 4), // px per frame
+        speed: rand(1.4, 2.8),
       });
     }
   }
@@ -61,7 +66,7 @@
         x: rand(-width, width),
         y: rand(-height, height),
         len: rand(12, 24),
-        speed: rand(2, 4),
+        speed: rand(1.4, 3.2),
       });
     }
   }
@@ -74,14 +79,14 @@
       const col = columns[i];
       const headY = col.y;
 
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "rgba(255,255,255,0.95)";
       ctx.fillText(randomChar(), col.x, headY);
 
-      ctx.fillStyle = "#bbbbbb";
+      ctx.fillStyle = "rgba(210,210,210,0.85)";
       ctx.fillText(randomChar(), col.x, headY - FONT_SIZE);
       ctx.fillText(randomChar(), col.x, headY - FONT_SIZE * 2);
 
-      ctx.fillStyle = "#444444";
+      ctx.fillStyle = "rgba(90,90,90,0.72)";
       for (let t = 3; t <= 10; t++) {
         ctx.fillText(randomChar(), col.x, headY - FONT_SIZE * t);
       }
@@ -89,13 +94,13 @@
       col.y += col.speed;
       if (col.y - FONT_SIZE * 10 > height) {
         col.y = rand(-height, 0);
-        col.speed = rand(2, 4);
+        col.speed = rand(1.4, 2.8);
       }
     }
   }
 
   function drawDiagonalStreaks(width, height) {
-    ctx.strokeStyle = "#ffffff";
+    ctx.strokeStyle = "rgba(255,255,255,0.38)";
     ctx.lineWidth = 1;
     ctx.globalAlpha = 0.5;
 
@@ -113,7 +118,7 @@
         s.x = rand(-width * 0.3, width * 0.3);
         s.y = rand(-height, 0);
         s.len = rand(12, 24);
-        s.speed = rand(2, 4);
+        s.speed = rand(1.4, 3.2);
       }
     }
 
@@ -147,22 +152,48 @@
 
     const imgRatio = heroImage.width / heroImage.height;
     const canvasRatio = width / height;
-    let drawWidth = width;
-    let drawHeight = height;
-    let offsetX = 0;
-    let offsetY = 0;
+    let drawWidth;
+    let drawHeight;
 
     if (imgRatio > canvasRatio) {
-      drawWidth = width;
-      drawHeight = width / imgRatio;
-      offsetY = (height - drawHeight) / 2;
+      drawHeight = height * 0.98;
+      drawWidth = drawHeight * imgRatio;
     } else {
-      drawHeight = height;
-      drawWidth = height * imgRatio;
-      offsetX = (width - drawWidth) / 2;
+      drawWidth = width * 0.98;
+      drawHeight = drawWidth / imgRatio;
     }
 
+    const offsetX = width - drawWidth - width * 0.05;
+    const offsetY = (height - drawHeight) * 0.5 - height * 0.015;
+
+    ctx.save();
+    ctx.filter = "grayscale(1) contrast(1.18) brightness(0.9)";
+    ctx.globalAlpha = 0.96;
     ctx.drawImage(heroImage, offsetX, offsetY, drawWidth, drawHeight);
+    ctx.restore();
+
+    ctx.save();
+    ctx.globalCompositeOperation = "multiply";
+    const shadow = ctx.createLinearGradient(0, 0, width, 0);
+    shadow.addColorStop(0, "rgba(0,0,0,0)");
+    shadow.addColorStop(0.45, "rgba(0,0,0,0.18)");
+    shadow.addColorStop(1, "rgba(0,0,0,0.48)");
+    ctx.fillStyle = shadow;
+    ctx.fillRect(0, 0, width, height);
+    ctx.restore();
+
+    ctx.save();
+    ctx.strokeStyle = "rgba(255,255,255,0.22)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(width * 0.08, height * 0.12, width * 0.84, height * 0.72);
+    ctx.strokeStyle = "rgba(255,255,255,0.1)";
+    ctx.beginPath();
+    ctx.moveTo(width * 0.12, height * 0.22);
+    ctx.lineTo(width * 0.88, height * 0.22);
+    ctx.moveTo(width * 0.12, height * 0.74);
+    ctx.lineTo(width * 0.88, height * 0.74);
+    ctx.stroke();
+    ctx.restore();
   }
 
   function frame() {
