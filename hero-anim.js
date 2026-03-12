@@ -10,8 +10,8 @@
   const label = document.querySelector(".hero-art-label span");
   const signalCount = document.getElementById("hero-signal-count");
 
-  const FONT_SIZE = 14;
-  const COL_SPACING = 18;
+  const FONT_SIZE = 13;
+  const COL_SPACING = 20;
   const CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&*+-<>[]{}?/\\";
   const HERO_IMAGE_SRC = "reda-hero.png";
 
@@ -53,7 +53,7 @@
       columns.push({
         x: i * COL_SPACING,
         y: rand(-height, 0),
-        speed: rand(1.4, 2.8),
+        speed: rand(1.1, 2.1),
       });
     }
   }
@@ -66,7 +66,7 @@
         x: rand(-width, width),
         y: rand(-height, height),
         len: rand(12, 24),
-        speed: rand(1.4, 3.2),
+        speed: rand(1.1, 2.4),
       });
     }
   }
@@ -79,14 +79,14 @@
       const col = columns[i];
       const headY = col.y;
 
-      ctx.fillStyle = "rgba(255,255,255,0.95)";
+      ctx.fillStyle = "rgba(255,255,255,0.72)";
       ctx.fillText(randomChar(), col.x, headY);
 
-      ctx.fillStyle = "rgba(210,210,210,0.85)";
+      ctx.fillStyle = "rgba(200,200,200,0.42)";
       ctx.fillText(randomChar(), col.x, headY - FONT_SIZE);
       ctx.fillText(randomChar(), col.x, headY - FONT_SIZE * 2);
 
-      ctx.fillStyle = "rgba(90,90,90,0.72)";
+      ctx.fillStyle = "rgba(90,90,90,0.22)";
       for (let t = 3; t <= 10; t++) {
         ctx.fillText(randomChar(), col.x, headY - FONT_SIZE * t);
       }
@@ -94,13 +94,13 @@
       col.y += col.speed;
       if (col.y - FONT_SIZE * 10 > height) {
         col.y = rand(-height, 0);
-        col.speed = rand(1.4, 2.8);
+        col.speed = rand(1.1, 2.1);
       }
     }
   }
 
   function drawDiagonalStreaks(width, height) {
-    ctx.strokeStyle = "rgba(255,255,255,0.38)";
+    ctx.strokeStyle = "rgba(255,255,255,0.14)";
     ctx.lineWidth = 1;
     ctx.globalAlpha = 0.5;
 
@@ -118,7 +118,7 @@
         s.x = rand(-width * 0.3, width * 0.3);
         s.y = rand(-height, 0);
         s.len = rand(12, 24);
-        s.speed = rand(1.4, 3.2);
+        s.speed = rand(1.1, 2.4);
       }
     }
 
@@ -176,17 +176,17 @@
     ctx.globalCompositeOperation = "multiply";
     const shadow = ctx.createLinearGradient(0, 0, width, 0);
     shadow.addColorStop(0, "rgba(0,0,0,0)");
-    shadow.addColorStop(0.45, "rgba(0,0,0,0.18)");
-    shadow.addColorStop(1, "rgba(0,0,0,0.48)");
+    shadow.addColorStop(0.45, "rgba(0,0,0,0.12)");
+    shadow.addColorStop(1, "rgba(0,0,0,0.34)");
     ctx.fillStyle = shadow;
     ctx.fillRect(0, 0, width, height);
     ctx.restore();
 
     ctx.save();
-    ctx.strokeStyle = "rgba(255,255,255,0.22)";
+    ctx.strokeStyle = "rgba(255,255,255,0.14)";
     ctx.lineWidth = 1;
     ctx.strokeRect(width * 0.08, height * 0.12, width * 0.84, height * 0.72);
-    ctx.strokeStyle = "rgba(255,255,255,0.1)";
+    ctx.strokeStyle = "rgba(255,255,255,0.06)";
     ctx.beginPath();
     ctx.moveTo(width * 0.12, height * 0.22);
     ctx.lineTo(width * 0.88, height * 0.22);
