@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Signals — Reda Essabre</title>
+  <meta name="description" content="Global client network. Real feedback from real engagements across Europe and the Americas. Data Engineer & Automation Expert — Reda Essabre.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='7' fill='none' stroke='%23ffffff' stroke-width='2'/><line x1='16' y1='2' x2='16' y2='6' stroke='%23ffffff' stroke-width='2'/><line x1='16' y1='26' x2='16' y2='30' stroke='%23ffffff' stroke-width='2'/><line x1='2' y1='16' x2='6' y2='16' stroke='%23ffffff' stroke-width='2'/><line x1='26' y1='16' x2='30' y2='16' stroke='%23ffffff' stroke-width='2'/><line x1='6.3' y1='6.3' x2='9' y2='9' stroke='%23ffffff' stroke-width='2'/><line x1='23' y1='23' x2='25.7' y2='25.7' stroke='%23ffffff' stroke-width='2'/><line x1='25.7' y1='6.3' x2='23' y2='9' stroke='%23ffffff' stroke-width='2'/><line x1='9' y1='23' x2='6.3' y2='25.7' stroke='%23ffffff' stroke-width='2'/></svg>">
+
+  <style>
+    /* ============================================================
+       CLIENT SIGNALS — PAGE-SPECIFIC STYLES
+       ============================================================ */
+
+    /* ---------- WORLD MAP SECTION ---------- */
+    .world-section {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 52px);
+      min-height: 520px;
+      overflow: hidden;
+      border-bottom: 3px solid var(--paper);
+    }
+
+    #world-canvas {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Subtle dither overlay on top of canvas for depth */
+    .world-section::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 8px 8px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .world-ui {
+      position: absolute;
+      inset: 0;
+      padding: 2rem 2.5rem;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+
+    .world-header {
+      max-width: 600px;
+    }
+
+    .world-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      line-height: 0.88;
+      color: var(--paper);
+      margin: 0.6rem 0 1rem;
+      animation: heroIntro 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+    }
+
+    .world-title-inv {
+      display: inline-block;
+      background: var(--paper);
+      color: var(--ink);
+      padding: 0.04em 0.18em;
+      transform: skewX(-2deg);
+      line-height: 1;
+    }
+
+    .world-sub {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      margin-top: 0.8rem;
+      animation: heroIntro 1s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+    }
+
+    .world-status-bar {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      animation: heroIntro 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+    }
+
+    .world-stat {
+      font-family: var(--font-mono);
+      font-size: 0.52rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .world-stat::before {
+      content: '●';
+      color: var(--amber);
+      font-size: 0.38rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .world-stat em { color: var(--paper); font-style: normal; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    .scroll-prompt {
+      position: absolute;
+      bottom: 1.8rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.22);
+      z-index: 10;
+      animation: scrollBounce 2.5s ease-in-out infinite;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.22; }
+      50% { transform: translateX(-50%) translateY(5px); opacity: 0.5; }
+    }
+
+    /* ---------- REVIEWS SECTION ---------- */
+    .reviews-section {
+      padding: 3.5rem 0;
+      border-bottom: 3px solid var(--paper);
+    }
+
+    .signal-log {
+      margin-top: 1.6rem;
+      border: 3px solid var(--paper);
+    }
+
+    /* Table-style header row */
+    .signal-log-head {
+      display: grid;
+      grid-template-columns: 90px 160px 1fr 110px 80px;
+      gap: 0.8rem;
+      background: var(--paper);
+      color: var(--ink);
+      padding: 0.55rem 1.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.48rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      align-items: center;
+    }
+
+    /* Individual review row */
+    .signal-row {
+      padding: 1.6rem 1.4rem;
+      border-bottom: 2px solid rgba(255,255,255,0.1);
+      position: relative;
+      /* Scroll-reveal initial state */
+      opacity: 0;
+      transform: translateY(18px);
+      transition:
+        opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        background 0.25s ease;
+    }
+
+    .signal-row:last-child { border-bottom: none; }
+    .signal-row.revealed  { opacity: 1; transform: translateY(0); }
+
+    /* Staggered transition delays */
+    .signal-row:nth-child(2)  { transition-delay: 0.04s; }
+    .signal-row:nth-child(3)  { transition-delay: 0.09s; }
+    .signal-row:nth-child(4)  { transition-delay: 0.14s; }
+    .signal-row:nth-child(5)  { transition-delay: 0.19s; }
+    .signal-row:nth-child(6)  { transition-delay: 0.24s; }
+    .signal-row:nth-child(7)  { transition-delay: 0.29s; }
+
+    /* Subtle hover background using the dither pattern */
+    .signal-row:hover {
+      background-color: rgba(255,255,255,0.03);
+      background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 6px 6px;
+    }
+
+    /* Left amber accent bar on hover */
+    .signal-row::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--amber);
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .signal-row:hover::before { transform: scaleY(1); }
+
+    /* Meta row: signal ID, origin, status, rating */
+    .signal-meta {
+      display: grid;
+      grid-template-columns: 90px 160px 1fr 110px 80px;
+      gap: 0.8rem;
+      align-items: center;
+      margin-bottom: 0.9rem;
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .signal-id      { color: var(--amber); font-weight: 700; }
+    .signal-origin  { color: rgba(255,255,255,0.4); }
+    .signal-period  { color: rgba(255,255,255,0.25); }
+    .signal-status  { color: rgba(255,255,255,0.45); }
+    .signal-rating  { color: var(--amber); letter-spacing: 0.06em; }
+
+    .signal-person {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 0.9rem;
+      flex-wrap: wrap;
+    }
+
+    .signal-name {
+      font-family: var(--font-display);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--paper);
+    }
+
+    .signal-role {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .signal-quote {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.62);
+      line-height: 1.85;
+      padding-left: 1.2rem;
+      border-left: 2px solid rgba(255,255,255,0.14);
+      margin: 0;
+      max-width: 78ch;
+    }
+
+    /* ---------- SUBMIT SECTION ---------- */
+    .submit-section {
+      padding: 3.5rem 0;
+      border-bottom: 3px solid var(--paper);
+    }
+
+    .submit-intro {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.38);
+      line-height: 1.75;
+      max-width: 56ch;
+      margin-bottom: 1.8rem;
+    }
+
+    .submit-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      border: 3px solid var(--paper);
+    }
+
+    .submit-main {
+      padding: 2rem;
+      border-right: 3px solid var(--paper);
+    }
+
+    .submit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 1.6rem;
+    }
+
+    .submit-side {
+      padding: 1.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    /* Rating selector */
+    .rating-group { margin-bottom: 1.1rem; }
+
+    .rating-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+    }
+
+    .rating-radio { display: none; }
+
+    .rating-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.3);
+      cursor: crosshair;
+      padding: 0.4rem 0.7rem;
+      border: 1px solid rgba(255,255,255,0.12);
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+      letter-spacing: 0.1em;
+      display: block;
+    }
+
+    .rating-label:hover {
+      color: var(--paper);
+      border-color: rgba(255,255,255,0.35);
+    }
+
+    .rating-radio:checked + .rating-label {
+      color: var(--amber);
+      border-color: var(--amber);
+      background: rgba(212,168,67,0.07);
+    }
+
+    /* Form feedback message */
+    .review-feedback {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-top: 0.9rem;
+      display: none;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid currentColor;
+    }
+
+    /* Side info panels */
+    .info-panel {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      color: rgba(255,255,255,0.28);
+      line-height: 2;
+      padding: 1rem;
+      border: 2px solid rgba(255,255,255,0.1);
+    }
+
+    .info-panel-title {
+      font-size: 0.48rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .info-panel div { display: flex; gap: 0.4rem; }
+    .info-panel div::before { content: '◆'; color: var(--amber); flex-shrink: 0; }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 960px) {
+      .signal-log-head {
+        grid-template-columns: 80px 1fr;
+      }
+      .signal-log-head span:nth-child(n+3) { display: none; }
+
+      .signal-meta {
+        grid-template-columns: 80px 1fr;
+      }
+      .signal-meta .signal-period,
+      .signal-meta .signal-status,
+      .signal-meta .signal-rating { display: none; }
+
+      .signal-person { gap: 0.4rem; }
+      .signal-name   { font-size: 0.75rem; }
+
+      .submit-layout {
+        grid-template-columns: 1fr;
+      }
+      .submit-main  { border-right: none; border-bottom: 3px solid var(--paper); }
+      .submit-grid  { grid-template-columns: 1fr; }
+      .submit-side  { padding: 1.4rem; }
+    }
+
+    @media (max-width: 600px) {
+      .world-title  { font-size: clamp(2rem, 10vw, 3rem); }
+      .world-ui     { padding: 1.5rem; }
+      .world-status-bar { gap: 1rem; }
+      .signal-row   { padding: 1.2rem 1rem; }
+      .submit-main  { padding: 1.4rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+<div id="overlay"></div>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <svg class="logo-sun" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="8" stroke="white" stroke-width="2"/>
+        <line x1="20" y1="2"  x2="20" y2="8"  stroke="white" stroke-width="2"/>
+        <line x1="20" y1="32" x2="20" y2="38" stroke="white" stroke-width="2"/>
+        <line x1="2"  y1="20" x2="8"  y2="20" stroke="white" stroke-width="2"/>
+        <line x1="32" y1="20" x2="38" y2="20" stroke="white" stroke-width="2"/>
+        <line x1="6.7"  y1="6.7"  x2="10.9" y2="10.9" stroke="white" stroke-width="2"/>
+        <line x1="29.1" y1="29.1" x2="33.3" y2="33.3" stroke="white" stroke-width="2"/>
+        <line x1="33.3" y1="6.7"  x2="29.1" y2="10.9" stroke="white" stroke-width="2"/>
+        <line x1="10.9" y1="29.1" x2="6.7"  y2="33.3" stroke="white" stroke-width="2"/>
+      </svg>
+      <div class="logo-text">Reda Essabre<span>☀ Sun Signature</span></div>
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="resume.html">Resume</a>
+      <a href="work.html">Work</a>
+      <a href="clients.html" class="active">Signals</a>
+      <a href="contact.html">Contact</a>
+      <a href="game.html" class="nav-game">▶ PLAY</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============================================================
+     SECTION 1 — WORLD MAP / HERO
+     ============================================================ -->
+<section class="world-section">
+  <canvas id="world-canvas"></canvas>
+
+  <div class="world-ui">
+    <!-- Top-left copy -->
+    <div class="world-header">
+      <span class="section-label">// Client Signals · Global Network</span>
+      <h1 class="world-title">
+        Trusted<br>
+        <span class="world-title-inv">Across</span><br>
+        Borders
+      </h1>
+      <p class="world-sub">10 cities &nbsp;·&nbsp; 3 continents &nbsp;·&nbsp; Reliable delivery across time zones</p>
+    </div>
+
+    <!-- Bottom-left status bar -->
+    <div class="world-status-bar">
+      <div class="world-stat">
+        Active Signals: <em id="signal-count">0</em>
+      </div>
+      <div class="world-stat">
+        Nodes Online: <em>10</em>
+      </div>
+      <div class="world-stat">
+        Continents: <em>3</em>
+      </div>
+      <div class="world-stat">
+        Status: <em>Live</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-prompt">Scroll for client feedback &nbsp;↓</div>
+</section>
+
+<!-- ============================================================
+     SECTION 2 — SIGNAL LOG / REVIEWS
+     ============================================================ -->
+<section class="reviews-section" id="reviews-section">
+  <div class="container">
+    <span class="section-label">// SIG-LOG · Verified Client Feedback</span>
+    <h2>Client Signals</h2>
+
+    <div class="signal-log" role="list">
+
+      <!-- Table header -->
+      <div class="signal-log-head" aria-hidden="true">
+        <span>Signal</span>
+        <span>Origin</span>
+        <span>Period</span>
+        <span>Status</span>
+        <span>Rating</span>
+      </div>
+
+      <!-- ── SIG-001 ── -->
+      <div class="signal-row" role="listitem">
+        <div class="signal-meta">
+          <span class="signal-id">SIG-001</span>
+          <span class="signal-origin">Dublin, Ireland</span>
+          <span class="signal-period">2023 / Q4</span>
+          <span class="signal-status">✓ Verified</span>
+          <span class="signal-rating">◆◆◆◆◆</span>
+        </div>
+        <div class="signal-person">
+          <span class="signal-name">Sarah Mitchell</span>
+          <span class="signal-role">Head of Operations · EduPath Technologies</span>
+        </div>
+        <blockquote class="signal-quote">
+          "Reda completely transformed how our operations team handles reporting. What used to take three hours each week became a single automated run. His ability to understand what we actually needed — not just what we asked for — made all the difference."
+        </blockquote>
+      </div>
+
+      <!-- ── SIG-002 ── -->
+      <div class="signal-row" role="listitem">
+        <div class="signal-meta">
+          <span class="signal-id">SIG-002</span>
+          <span class="signal-origin">Paris, France</span>
+          <span class="signal-period">2022 / Q2</span>
+          <span class="signal-status">✓ Verified</span>
+          <span class="signal-rating">◆◆◆◆◆</span>
+        </div>
+        <div class="signal-person">
+          <span class="signal-name">Thomas Renault</span>
+          <span class="signal-role">Solutions Architect · Fokal Digital</span>
+        </div>
+        <blockquote class="signal-quote">
+          "Working with Reda on the API integration layer was a reminder of what good technical delivery looks like. He didn't just implement what was spec'd — he flagged edge cases, validated the data flow end-to-end, and made sure the system would hold up under production load."
+        </blockquote>
+      </div>
+
+      <!-- ── SIG-003 ── -->
+      <div class="signal-row" role="listitem">
+        <div class="signal-meta">
+          <span class="signal-id">SIG-003</span>
+          <span class="signal-origin">Manchester, UK</span>
+          <span class="signal-period">2024 / Q1</span>
+          <span class="signal-status">✓ Verified</span>
+          <span class="signal-rating">◆◆◆◆◆</span>
+        </div>
+        <div class="signal-person">
+          <span class="signal-name">James Calloway</span>
+          <span class="signal-role">VP Technology · Sigma Learning Group</span>
+        </div>
+        <blockquote class="signal-quote">
+          "The automation workflow Reda built for our account management process eliminated an entire category of manual errors. The rule engine handles thousands of events per week without any manual intervention. Solid ownership from start to finish."
+        </blockquote>
+      </div>
+
+      <!-- ── SIG-004 ── -->
+      <div class="signal-row" role="listitem">
+        <div class="signal-meta">
+          <span class="signal-id">SIG-004</span>
+          <span class="signal-origin">Milan, Italy</span>
+          <span class="signal-period">2024 / Q2</span>
+          <span class="signal-status">✓ Verified</span>
+          <span class="signal-rating">◆◆◆◆◆</span>
+        </div>
+        <div class="signal-person">
+          <span class="signal-name">Claire Dupont</span>
+          <span class="signal-role">Data Operations Manager · Nexus Finance</span>
+        </div>
+        <blockquote class="signal-quote">
+          "Reda is the kind of consultant who goes deep. He didn't just fix the SQL performance issue — he profiled the full query plan, restructured the joins, and documented everything clearly. Our dashboard now loads in under 3 seconds instead of 45+."
+        </blockquote>
+      </div>
+
+      <!-- ── SIG-005 ── -->
+      <div class="signal-row" role="listitem">
+        <div class="signal-meta">
+          <span class="signal-id">SIG-005</span>
+          <span class="signal-origin">La Paz, Bolivia</span>
+          <span class="signal-period">2023 / Q2</span>
+          <span class="signal-status">✓ Verified</span>
+          <span class="signal-rating">◆◆◆◆◆</span>
+        </div>
+        <div class="signal-person">
+          <span class="signal-name">Roberto Salinas</span>
+          <span class="signal-role">IT Director · BolData Systems</span>
+        </div>
+        <blockquote class="signal-quote">
+          "One of the few consultants I've worked with who genuinely understands both the business side and the technical side. His SSRS reporting work gave our finance team visibility they hadn't had before. Responsive, thorough, and reliable throughout the entire engagement."
+        </blockquote>
+      </div>
+
+      <!-- ── SIG-006 ── -->
+      <div class="signal-row" role="listitem">
+        <div class="signal-meta">
+          <span class="signal-id">SIG-006</span>
+          <span class="signal-origin">Ottawa, Canada</span>
+          <span class="signal-period">2023 / Q3</span>
+          <span class="signal-status">✓ Verified</span>
+          <span class="signal-rating">◆◆◆◆◆</span>
+        </div>
+        <div class="signal-person">
+          <span class="signal-name">Priya Nair</span>
+          <span class="signal-role">Implementation Manager · CloudOps Partners</span>
+        </div>
+        <blockquote class="signal-quote">
+          "Reda handled a complex ERP integration under real pressure — tight timelines, stakeholder dependencies, and tricky data mapping challenges. He resolved issues quickly and kept everyone informed. I wouldn't hesitate to bring him back on the next project."
+        </blockquote>
+      </div>
+
+    </div><!-- /.signal-log -->
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 3 — LEAVE A REVIEW / OPEN SIGNAL
+     ============================================================ -->
+<section class="submit-section">
+  <div class="container">
+    <span class="section-label">// Open Signal · Submit Review</span>
+    <h2>Leave a Signal</h2>
+    <p class="submit-intro">
+      Worked with me? Leave a signal. All submissions are reviewed before going live.
+      Your email is stored privately and never displayed publicly.
+    </p>
+
+    <div class="submit-layout">
+
+      <!-- Form area -->
+      <div class="submit-main">
+        <div id="review-form">
+
+          <div class="submit-grid">
+            <div class="form-group">
+              <label class="form-label" for="rv-name">Full Name *</label>
+              <input class="form-control" id="rv-name" type="text"
+                     placeholder="Jane Smith" autocomplete="name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="rv-role">Role / Job Title</label>
+              <input class="form-control" id="rv-role" type="text"
+                     placeholder="Head of Operations">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="rv-company">Company / Organisation</label>
+              <input class="form-control" id="rv-company" type="text"
+                     placeholder="Acme Corp">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="rv-location">Location</label>
+              <input class="form-control" id="rv-location" type="text"
+                     placeholder="Dublin, Ireland">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="rv-email">Email — private, never displayed</label>
+            <input class="form-control" id="rv-email" type="email"
+                   placeholder="jane@company.com" autocomplete="email">
+          </div>
+
+          <!-- Rating selector -->
+          <div class="rating-group">
+            <div class="form-label">Recommendation Level</div>
+            <div class="rating-options">
+              <input type="radio" name="rv-rating" id="rv-r5" value="5" class="rating-radio" checked>
+              <label for="rv-r5" class="rating-label">◆◆◆◆◆ &nbsp; Strongly recommend</label>
+
+              <input type="radio" name="rv-rating" id="rv-r4" value="4" class="rating-radio">
+              <label for="rv-r4" class="rating-label">◆◆◆◆ &nbsp; Recommend</label>
+
+              <input type="radio" name="rv-rating" id="rv-r3" value="3" class="rating-radio">
+              <label for="rv-r3" class="rating-label">◆◆◆ &nbsp; Neutral</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="rv-text">Your Review *</label>
+            <textarea class="form-control" id="rv-text"
+                      style="min-height: 150px;"
+                      placeholder="Describe your experience working with Reda — what was the engagement, what was the outcome, how was the collaboration..."></textarea>
+          </div>
+
+          <button class="btn btn-filled" id="review-submit-btn" style="margin-top:0.5rem;">
+            ◆ TRANSMIT SIGNAL
+          </button>
+          <div class="review-feedback" id="review-feedback"></div>
+        </div>
+      </div><!-- /.submit-main -->
+
+      <!-- Side info panels -->
+      <div class="submit-side">
+
+        <div class="info-panel">
+          <strong class="info-panel-title">// Data Policy</strong>
+          <div>Name & role may appear publicly if approved</div>
+          <div>Email is strictly private — never displayed</div>
+          <div>All reviews moderated before going live</div>
+          <div>Request removal at any time via contact</div>
+        </div>
+
+        <div class="info-panel">
+          <strong class="info-panel-title">// Backend Structure</strong>
+          <div>id · name · role · company</div>
+          <div>location · rating · text</div>
+          <div>submittedAt · status · source</div>
+          <div style="margin-top:0.4rem;opacity:0.45;">
+            Ready for Supabase / Firebase / Airtable
+          </div>
+        </div>
+
+        <a href="contact.html" class="btn" style="text-align:center; justify-content:center; font-size:0.6rem; width:100%;">
+          ◆ Or contact directly
+        </a>
+
+      </div><!-- /.submit-side -->
+    </div><!-- /.submit-layout -->
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="8" stroke="white" stroke-width="2"/>
+        <line x1="20" y1="2"  x2="20" y2="8"  stroke="white" stroke-width="2"/>
+        <line x1="20" y1="32" x2="20" y2="38" stroke="white" stroke-width="2"/>
+        <line x1="2"  y1="20" x2="8"  y2="20" stroke="white" stroke-width="2"/>
+        <line x1="32" y1="20" x2="38" y2="20" stroke="white" stroke-width="2"/>
+        <line x1="6.7"  y1="6.7"  x2="10.9" y2="10.9" stroke="white" stroke-width="2"/>
+        <line x1="29.1" y1="29.1" x2="33.3" y2="33.3" stroke="white" stroke-width="2"/>
+        <line x1="33.3" y1="6.7"  x2="29.1" y2="10.9" stroke="white" stroke-width="2"/>
+        <line x1="10.9" y1="29.1" x2="6.7"  y2="33.3" stroke="white" stroke-width="2"/>
+      </svg>
+      <div class="footer-brand-text">
+        <strong>Reda Essabre</strong>
+        © 2025 · France<br>
+        Data Engineer & Automation Expert<br>
+        ☀ Sun Signature
+      </div>
+    </div>
+    <div class="footer-mid"><div class="footer-dither-band"></div></div>
+    <div class="footer-nav">
+      <a href="index.html">Home</a>
+      <a href="resume.html">Resume</a>
+      <a href="work.html">Work</a>
+      <a href="clients.html">Signals</a>
+      <a href="contact.html">Contact</a>
+      <a href="game.html">▶ Play</a>
+      <a href="https://linkedin.com" target="_blank">LinkedIn ↗</a>
+      <a href="https://github.com" target="_blank">GitHub ↗</a>
+    </div>
+  </div>
+</footer>
+
+<!-- EASTER EGG MODAL (consistent with other pages) -->
+<div class="modal-backdrop" id="sun-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span>☀ SUN CONSOLE / UNLOCKED</span>
+      <button class="modal-close" onclick="closeModal()">[ × CLOSE ]</button>
+    </div>
+    <div class="modal-body">
+      You typed <strong>SUN</strong>.<br><br>
+      That's the kind of attention to detail I bring to every system I build.<br><br>
+      Hidden signals. Clean outputs. Zero noise.<br><br>
+      <em>"The best automation is the kind you don't notice — until it stops."</em>
+    </div>
+    <div class="modal-footer">
+      <a href="contact.html" class="btn btn-filled" onclick="closeModal()">◆ LET'S TALK →</a>
+    </div>
+  </div>
+</div>
+
+<div class="egg-hint">SECRET: TRY TYPING  S · U · N</div>
+
+<script src="main.js"></script>
+<script src="clients.js"></script>
+</body>
+</html>
