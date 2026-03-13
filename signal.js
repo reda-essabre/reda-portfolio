@@ -17,6 +17,7 @@
     { name: 'Dublin',      country: 'Ireland',  lat:  53.33, lon:  -6.25 },
     { name: 'Manchester',  country: 'UK',       lat:  53.48, lon:  -2.24 },
     { name: 'London',      country: 'UK',       lat:  51.51, lon:  -0.13 },
+    { name: 'Nicosia',     country: 'Cyprus',   lat:  35.19, lon:  33.38 },
     { name: 'Ottawa',      country: 'Canada',   lat:  45.42, lon: -75.69 },
     { name: 'Calgary',     country: 'Canada',   lat:  51.05, lon:-114.07 },
     { name: 'La Paz',      country: 'Bolivia',  lat: -16.50, lon: -68.15 },
@@ -26,8 +27,9 @@
 
   const CONNECTIONS = [
     [4, 0], [4, 2], [4, 3], [0, 1], [2, 0],
-    [4, 5], [0, 5], [5, 6], [5, 7], [6, 7],
-    [7, 8], [7, 9], [8, 9],
+    [0, 5], [1, 5], [4, 5],
+    [4, 6], [0, 6], [6, 7], [6, 8], [7, 8],
+    [8, 9], [8, 10], [9, 10],
   ];
 
   // Improved continent outlines — more coastline detail for Europe
@@ -65,6 +67,8 @@
      [51,-3],[51,0],[51,1],[52,2],[53,0],[53,0],[54,0],[56,0],[58,-2],[58,-5]],
     // Ireland
     [[55,-6],[54,-8],[52,-10],[52,-8],[53,-6],[55,-6]],
+    // Cyprus
+    [[35.7,32.0],[35.4,33.2],[35.1,34.4],[34.8,34.9],[34.7,33.9],[34.9,32.7],[35.2,32.0],[35.7,32.0]],
     // Africa
     [[37,10],[36,10],[33,12],[30,32],[28,34],[22,37],[18,40],[12,43],
      [10,42],[8,44],[11,44],[12,44],[8,44],[4,42],[0,42],[-4,40],
@@ -101,7 +105,7 @@
   // ============================================================
   // GLOBE STATE
   // ============================================================
-  let rotLon  = -28;   // start: Atlantic-centered view
+  let rotLon  = -20;   // start: Europe / Atlantic balanced view
   let rotLat  = 18;    // fixed tilt (latitude center of view)
   const ROT_SPEED = 0.022; // degrees per frame — ~3 min full rotation at 60fps
 
@@ -126,6 +130,7 @@
   let startTime       = null;
   let hoveredCity     = -1;
   let projectedCities = [];   // updated each frame, used for hover detection
+  const PRIMARY_CITY_INDEXES = new Set([0, 2, 4, 5, 6, 7, 8]);
 
   // ============================================================
   // ORTHOGRAPHIC PROJECTION
@@ -220,6 +225,23 @@
     ctx.beginPath();
     ctx.arc(globeCX, globeCY, globeR * 1.18, 0, Math.PI * 2);
     ctx.fill();
+
+    ctx.save();
+    ctx.translate(globeCX, globeCY);
+    ctx.rotate(-0.16);
+    [
+      { r: 1.1,  a0: 3.92, a1: 5.32, color: `rgba(${BLUE_RGB},0.78)`, width: 2.2 },
+      { r: 1.1,  a0: 5.85, a1: 0.58, color: 'rgba(214,241,126,0.75)', width: 1.8 },
+      { r: 1.16, a0: 0.20, a1: 2.24, color: `rgba(${BLUE_RGB},0.5)`, width: 1.4 },
+      { r: 1.16, a0: 2.78, a1: 3.72, color: 'rgba(214,241,126,0.6)', width: 1.4 },
+    ].forEach(ring => {
+      ctx.beginPath();
+      ctx.strokeStyle = ring.color;
+      ctx.lineWidth = ring.width;
+      ctx.arc(0, 0, globeR * ring.r, ring.a0, ring.a1);
+      ctx.stroke();
+    });
+    ctx.restore();
 
     // ── Everything inside the globe silhouette ───────────────
     ctx.save();
@@ -406,7 +428,7 @@
       ctx.fill();
 
       // Labels — inside clip, only for primary cities or hovered
-      const primary = [0, 2, 4, 5, 6, 7].includes(i); // Paris, Dublin, London, Ottawa, Calgary, La Paz
+      const primary = PRIMARY_CITY_INDEXES.has(i);
       if (isHovered || primary) {
         const city = CITIES[i];
         // Label goes left or right depending on globe position
@@ -467,6 +489,10 @@
     window.addEventListener('resize', resize, { passive: true });
 
     const ctx = canvas.getContext('2d');
+    const nodeCountEl = document.querySelector('[data-sg-count=\"nodes\"]');
+    const connectionCountEl = document.querySelector('[data-sg-count=\"connections\"]');
+    if (nodeCountEl) nodeCountEl.textContent = String(CITIES.length);
+    if (connectionCountEl) connectionCountEl.textContent = String(CONNECTIONS.length);
     requestAnimationFrame(ts => draw(canvas, ctx, ts));
 
     // ── Hover + tooltip ──────────────────────────────────────
