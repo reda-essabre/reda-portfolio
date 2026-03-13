@@ -453,7 +453,7 @@
   // CANVAS INIT + RESIZE
   // ============================================================
   function initCanvas() {
-    const canvas  = document.getElementById('sg-canvas');
+    const canvas  = document.getElementById('sg-canvas'); // legacy canvas — no-op if absent
     const tooltip = document.getElementById('sg-tooltip');
     if (!canvas) return;
 
@@ -519,15 +519,16 @@
   // ============================================================
   function initScrollFade() {
     const map    = document.querySelector('.sg-map');
-    const canvas = document.getElementById('sg-canvas');
-    const mapUI  = document.querySelector('.sg-map-ui');
+    const canvas = document.getElementById('sg-globe-canvas');
+    const globeUI = document.getElementById('sg-globe-ui');
     if (!map || !canvas) return;
 
     window.addEventListener('scroll', () => {
       const rect     = map.getBoundingClientRect();
       const progress = 1 - Math.max(0, Math.min(1, rect.bottom / window.innerHeight));
-      canvas.style.opacity = Math.max(0, 1 - progress * 1.6);
-      if (mapUI) mapUI.style.opacity = Math.max(0, 1 - progress * 2.2);
+      const opacity  = Math.max(0, 1 - progress * 1.6);
+      canvas.style.opacity   = opacity;
+      if (globeUI) globeUI.style.opacity = Math.max(0, 1 - progress * 2.2);
     }, { passive: true });
   }
 
