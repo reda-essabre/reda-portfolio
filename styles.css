@@ -38,8 +38,8 @@ body {
 
 .motion-pending {
   opacity: 0;
-  transform: translateY(36px);
-  filter: blur(8px);
+  transform: translateY(24px);
+  filter: blur(6px);
 }
 
 .motion-section,
@@ -55,9 +55,9 @@ body {
 .footer-nav,
 .footer-mid {
   transition:
-    opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-    filter 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 1.1s cubic-bezier(0.19, 1, 0.22, 1),
+    transform 1.1s cubic-bezier(0.19, 1, 0.22, 1),
+    filter 1.1s cubic-bezier(0.19, 1, 0.22, 1);
   will-change: transform, opacity, filter;
 }
 
@@ -83,10 +83,10 @@ body {
   position: relative;
   overflow: hidden;
   transition:
-    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.35s ease,
-    background-color 0.35s ease,
-    box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transform 0.8s cubic-bezier(0.19, 1, 0.22, 1),
+    border-color 0.45s ease,
+    background-color 0.45s ease,
+    box-shadow 0.8s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .has-spotlight::after {
@@ -94,16 +94,16 @@ body {
   position: absolute;
   inset: -24%;
   background:
-    radial-gradient(circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.08) 18%, rgba(255,255,255,0) 48%);
+    radial-gradient(circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 20%, rgba(255,255,255,0) 52%);
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.55s ease;
   pointer-events: none;
 }
 
 .has-spotlight:hover,
 .has-spotlight:focus-within {
-  transform: translateY(-6px);
-  box-shadow: 0 18px 50px rgba(0,0,0,0.28);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.2);
 }
 
 .has-spotlight:hover::after,
@@ -116,11 +116,11 @@ nav a,
 .footer-nav a,
 .logo {
   transition:
-    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    background-color 0.25s ease,
-    color 0.25s ease,
-    border-color 0.25s ease,
-    opacity 0.25s ease;
+    transform 0.7s cubic-bezier(0.19, 1, 0.22, 1),
+    background-color 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    opacity 0.35s ease;
 }
 
 /* ============================================================
@@ -405,7 +405,7 @@ nav a {
 nav a:hover, nav a.active {
   background: var(--paper);
   color: var(--ink);
-  transform: translateY(-1px);
+  transform: translateY(-0.5px);
 }
 
 nav a.nav-game {
@@ -506,13 +506,13 @@ h3 {
 .btn:hover {
   background: var(--paper);
   color: var(--ink);
-  transform: translateY(-4px);
+  transform: translateY(-2px);
 }
 
 .btn:hover::before { border-color: rgba(0,0,0,0.2); }
 
 .btn:active {
-  transform: translateY(-1px) scale(0.985);
+  transform: translateY(0) scale(0.992);
 }
 
 .btn-filled {
@@ -619,7 +619,7 @@ h3 {
   gap: 4.5rem;
   align-items: center;
   transform: translate3d(var(--hero-tilt-x), var(--hero-tilt-y), 0);
-  transition: transform 0.45s ease-out;
+  transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .hero-copy {
@@ -628,7 +628,7 @@ h3 {
 }
 
 .hero-copy > * {
-  animation: heroIntro 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: heroIntro 1.2s cubic-bezier(0.19, 1, 0.22, 1) both;
 }
 
 .hero-copy > *:nth-child(1) { animation-delay: 0.08s; }
@@ -738,7 +738,7 @@ h3 {
     0 0 0 1px rgba(255,255,255,0.06) inset,
     24px 24px 60px rgba(0,0,0,0.35);
   transform: perspective(1200px) rotateX(calc(var(--hero-tilt-y) * -0.03)) rotateY(calc(var(--hero-tilt-x) * 0.03));
-  transition: transform 0.45s ease-out, box-shadow 0.45s ease-out;
+  transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.8s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .hero-art::before {
@@ -768,7 +768,7 @@ h3 {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   backdrop-filter: blur(10px);
-  animation: orbitFloat 7s ease-in-out infinite;
+  animation: orbitFloat 10s ease-in-out infinite;
 }
 
 .hero-orbit-a {
@@ -901,8 +901,8 @@ h3 {
 @keyframes heroIntro {
   from {
     opacity: 0;
-    transform: translateY(20px);
-    filter: blur(12px);
+    transform: translateY(14px);
+    filter: blur(10px);
   }
   to {
     opacity: 1;
@@ -913,7 +913,7 @@ h3 {
 
 @keyframes orbitFloat {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-4px); }
 }
 
 /* ============================================================
@@ -935,7 +935,7 @@ h3 {
   inset: 0;
   background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.06) 48%, transparent 100%);
   transform: translateX(-120%);
-  animation: terminalSweep 8s linear infinite;
+  animation: terminalSweep 12s linear infinite;
   pointer-events: none;
 }
 
@@ -996,7 +996,7 @@ h3 {
   padding: 1.5rem 1.2rem;
   border-right: 3px solid var(--paper);
   position: relative;
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+  transition: transform 0.75s cubic-bezier(0.19, 1, 0.22, 1), background-color 0.45s ease;
 }
 
 .stat-block:last-child { border-right: none; }
@@ -1051,7 +1051,7 @@ h3 {
   border-right: 3px solid var(--paper);
   border-bottom: 3px solid var(--paper);
   position: relative;
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.75s cubic-bezier(0.19, 1, 0.22, 1), background-color 0.45s ease, border-color 0.45s ease;
 }
 
 .skill-tile:nth-child(even) { border-right: none; }
@@ -1116,7 +1116,7 @@ h3 {
   border-bottom: 3px solid var(--paper);
   position: relative;
   background: var(--ink);
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, color 0.3s ease;
+  transition: transform 0.75s cubic-bezier(0.19, 1, 0.22, 1), background-color 0.45s ease, color 0.45s ease;
 }
 
 .case-card:nth-child(even) {
@@ -1127,7 +1127,7 @@ h3 {
 .case-card:hover {
   background: var(--paper);
   color: var(--ink);
-  transform: translateY(-8px);
+  transform: translateY(-4px);
 }
 
 .case-card:hover .case-id,
@@ -1256,7 +1256,7 @@ h3 {
   background:
     linear-gradient(115deg, transparent 0%, rgba(255,255,255,0.08) 42%, rgba(255,255,255,0.22) 50%, rgba(255,255,255,0.08) 58%, transparent 100%);
   transform: translateX(-60%);
-  animation: philosophySweep 9s linear infinite;
+  animation: philosophySweep 14s linear infinite;
   pointer-events: none;
   mix-blend-mode: screen;
 }
@@ -1291,7 +1291,7 @@ h3 {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--paper);
-  animation: philosophyFloat 6s ease-in-out infinite;
+  animation: philosophyFloat 10s ease-in-out infinite;
 }
 
 .philosophy-sub {
@@ -1300,7 +1300,7 @@ h3 {
   line-height: 1.8;
   color: var(--ink);
   opacity: 0.8;
-  animation: philosophyFadeIn 0.9s ease-out both;
+  animation: philosophyFadeIn 1.15s cubic-bezier(0.19, 1, 0.22, 1) both;
 }
 
 @keyframes philosophySweep {
@@ -1310,11 +1310,11 @@ h3 {
 
 @keyframes philosophyFloat {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  50% { transform: translateY(-3px); }
 }
 
 @keyframes philosophyFadeIn {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 0.8; transform: translateY(0); }
 }
 
@@ -1709,7 +1709,7 @@ footer {
   background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
   background-size: 5px 5px;
   position: relative;
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+  transition: transform 0.75s cubic-bezier(0.19, 1, 0.22, 1), background-color 0.45s ease;
 }
 
 .award-badge-label {
@@ -1765,7 +1765,7 @@ footer {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1), border-color 0.45s ease;
 }
 
 .impact-metric:last-child { border-bottom: none; }

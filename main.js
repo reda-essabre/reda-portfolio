@@ -154,7 +154,7 @@ function initMagneticButtons() {
       const rect = el.getBoundingClientRect();
       const x = event.clientX - rect.left - rect.width / 2;
       const y = event.clientY - rect.top - rect.height / 2;
-      el.style.transform = `translate(${x * 0.08}px, ${y * 0.08}px)`;
+      el.style.transform = `translate(${x * 0.035}px, ${y * 0.035}px)`;
     });
 
     el.addEventListener('pointerleave', () => {
@@ -174,8 +174,8 @@ function initHeroParallax() {
   let currentY = 0;
 
   function render() {
-    currentX += (targetX - currentX) * 0.12;
-    currentY += (targetY - currentY) * 0.12;
+    currentX += (targetX - currentX) * 0.08;
+    currentY += (targetY - currentY) * 0.08;
     hero.style.setProperty('--hero-tilt-x', `${currentX}px`);
     hero.style.setProperty('--hero-tilt-y', `${currentY}px`);
 
@@ -190,8 +190,8 @@ function initHeroParallax() {
     const rect = hero.getBoundingClientRect();
     const px = (event.clientX - rect.left) / rect.width - 0.5;
     const py = (event.clientY - rect.top) / rect.height - 0.5;
-    targetX = px * 18;
-    targetY = py * 14;
+    targetX = px * 10;
+    targetY = py * 8;
 
     if (!rafId) rafId = requestAnimationFrame(render);
   });
