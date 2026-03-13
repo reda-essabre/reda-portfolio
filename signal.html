@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signal — Reda Essabre</title>
+  <meta name="description" content="Global collaboration network. Trusted delivery across Paris, London, Dublin, Milan, Ottawa, Calgary, Bolivia. Data Engineer & Automation Expert — Reda Essabre.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='7' fill='none' stroke='%23ffffff' stroke-width='2'/><line x1='16' y1='2' x2='16' y2='6' stroke='%23ffffff' stroke-width='2'/><line x1='16' y1='26' x2='16' y2='30' stroke='%23ffffff' stroke-width='2'/><line x1='2' y1='16' x2='6' y2='16' stroke='%23ffffff' stroke-width='2'/><line x1='26' y1='16' x2='30' y2='16' stroke='%23ffffff' stroke-width='2'/><line x1='6.3' y1='6.3' x2='9' y2='9' stroke='%23ffffff' stroke-width='2'/><line x1='23' y1='23' x2='25.7' y2='25.7' stroke='%23ffffff' stroke-width='2'/><line x1='25.7' y1='6.3' x2='23' y2='9' stroke='%23ffffff' stroke-width='2'/><line x1='9' y1='23' x2='6.3' y2='25.7' stroke='%23ffffff' stroke-width='2'/></svg>">
+
+  <style>
+    /* ============================================================
+       SIGNAL PAGE — all classes prefixed with sg-
+       Electric blue #38c5e8 is used ONLY for the data-signal
+       world visualization. All other UI is black / white / amber.
+       ============================================================ */
+
+    :root {
+      --blue:     #38c5e8;
+      --blue-rgb: 56,197,232;
+    }
+
+    /* ── Shared reveal animation ────────────────────────────── */
+    .sg-section-header,
+    .sg-cta-inner,
+    .sg-form-wrapper {
+      opacity: 0;
+      transform: translateY(22px);
+      transition:
+        opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .sg-section-header.sg-revealed,
+    .sg-cta-inner.sg-revealed,
+    .sg-form-wrapper.sg-revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── HERO ────────────────────────────────────────────────── */
+    .sg-hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: 3px solid var(--paper);
+      background: radial-gradient(
+        ellipse 90% 65% at 50% 50%,
+        rgba(var(--blue-rgb), 0.04) 0%,
+        #000 68%
+      );
+    }
+
+    /* Dot-grid atmosphere (matches site hero) */
+    .sg-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+      background-size: 10px 10px;
+      pointer-events: none;
+    }
+
+    /* Slow-scan line — premium cinematic detail */
+    .sg-hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(var(--blue-rgb), 0.12) 25%,
+        rgba(var(--blue-rgb), 0.28) 50%,
+        rgba(var(--blue-rgb), 0.12) 75%,
+        transparent 100%
+      );
+      animation: sgScan 12s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes sgScan {
+      0%   { top: 0%; opacity: 0; }
+      4%   { opacity: 1; }
+      96%  { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    .sg-hero-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 2rem 1.5rem;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .sg-hero-kicker {
+      font-family: var(--font-mono);
+      font-size: 0.56rem;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      color: rgba(var(--blue-rgb), 0.7);
+      margin-bottom: 2.5rem;
+      animation: heroIntro 1s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+    }
+
+    .sg-hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(5.5rem, 18vw, 13rem);
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--paper);
+      line-height: 0.88;
+      margin: 0;
+      animation: heroIntro 1s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+    }
+
+    .sg-hero-sub {
+      font-family: var(--font-mono);
+      font-size: clamp(0.72rem, 1.6vw, 0.95rem);
+      color: rgba(255,255,255,0.38);
+      letter-spacing: 0.14em;
+      line-height: 1.8;
+      margin-top: 2.2rem;
+      animation: heroIntro 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+    }
+
+    .sg-hero-rule {
+      width: 0;
+      height: 2px;
+      background: rgba(var(--blue-rgb), 0.5);
+      margin: 2.2rem auto;
+      animation: sgRule 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.48s both;
+    }
+
+    @keyframes sgRule {
+      from { width: 0; opacity: 0; }
+      to   { width: 56px; opacity: 1; }
+    }
+
+    .sg-hero-stats {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      font-family: var(--font-mono);
+      font-size: 0.52rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.28);
+      animation: heroIntro 1s cubic-bezier(0.16, 1, 0.3, 1) 0.62s both;
+    }
+
+    .sg-hero-stat-sep {
+      margin: 0 1.2rem;
+      color: rgba(var(--blue-rgb), 0.35);
+    }
+
+    .sg-scroll-cue {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 0.48rem;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.18);
+      animation: sgFloat 2.8s ease-in-out infinite;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    @keyframes sgFloat {
+      0%, 100% { opacity: 0.18; transform: translateX(-50%) translateY(0); }
+      50%       { opacity: 0.45; transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── WORLD MAP ───────────────────────────────────────────── */
+    .sg-map {
+      position: relative;
+      width: 100%;
+      height: 82vh;
+      min-height: 500px;
+      border-bottom: 3px solid var(--paper);
+      overflow: hidden;
+      background: #000;
+    }
+
+    #sg-canvas {
+      position: absolute;
+      inset: 0;
+      display: block;
+      transition: opacity 0.1s linear;
+    }
+
+    /* Bottom UI bar — fades with scroll */
+    .sg-map-ui {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 2rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 10;
+      pointer-events: none;
+      background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%);
+      transition: opacity 0.1s linear;
+    }
+
+    .sg-map-label {
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: rgba(var(--blue-rgb), 0.55);
+    }
+
+    .sg-map-meta {
+      display: flex;
+      gap: 2rem;
+      font-family: var(--font-mono);
+      font-size: 0.48rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+    }
+
+    .sg-map-meta em {
+      color: rgba(255,255,255,0.55);
+      font-style: normal;
+    }
+
+    /* City hover tooltip */
+    .sg-tooltip {
+      position: absolute;
+      background: rgba(0,0,0,0.9);
+      border: 1px solid rgba(var(--blue-rgb), 0.45);
+      padding: 0.5rem 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      color: var(--paper);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      z-index: 20;
+      white-space: nowrap;
+    }
+
+    .sg-tooltip.visible { opacity: 1; }
+
+    .sg-tooltip span {
+      display: block;
+      font-size: 0.48rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(var(--blue-rgb), 0.7);
+      margin-top: 0.1rem;
+    }
+
+    /* ── REVIEWS SECTION ────────────────────────────────────── */
+    .sg-reviews {
+      padding: 4.5rem 0;
+      border-bottom: 3px solid var(--paper);
+    }
+
+    .sg-review-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5px;
+      background: rgba(255,255,255,0.1);
+      margin-top: 2rem;
+    }
+
+    .sg-card {
+      background: var(--ink);
+      padding: 2.4rem;
+      position: relative;
+      opacity: 0;
+      transform: translateY(22px);
+      transition:
+        opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.4s ease;
+    }
+
+    /* Stagger delays */
+    .sg-card:nth-child(2) { transition-delay: 0.07s; }
+    .sg-card:nth-child(3) { transition-delay: 0.10s; }
+    .sg-card:nth-child(4) { transition-delay: 0.17s; }
+    .sg-card:nth-child(5) { transition-delay: 0.20s; }
+    .sg-card:nth-child(6) { transition-delay: 0.27s; }
+
+    .sg-card.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .sg-card:hover {
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.1),
+        0 28px 55px rgba(0,0,0,0.55);
+      z-index: 1;
+    }
+
+    /* Subtle left accent on hover */
+    .sg-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 2px;
+      background: rgba(var(--blue-rgb), 0.6);
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .sg-card:hover::before { transform: scaleY(1); }
+
+    .sg-card-geo {
+      font-family: var(--font-mono);
+      font-size: 0.48rem;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: rgba(var(--blue-rgb), 0.6);
+      margin-bottom: 1.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .sg-card-geo::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(var(--blue-rgb), 0.55);
+      flex-shrink: 0;
+      box-shadow: 0 0 6px rgba(var(--blue-rgb), 0.5);
+    }
+
+    .sg-card-quote {
+      font-family: var(--font-mono);
+      font-size: 0.77rem;
+      color: rgba(255,255,255,0.62);
+      line-height: 1.9;
+      margin: 0 0 2rem;
+      padding: 0;
+      border: none;
+    }
+
+    .sg-card-rule {
+      width: 28px;
+      height: 1px;
+      background: rgba(255,255,255,0.18);
+      margin-bottom: 1.2rem;
+    }
+
+    .sg-card-name {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--paper);
+      margin-bottom: 0.25rem;
+    }
+
+    .sg-card-role {
+      font-family: var(--font-mono);
+      font-size: 0.56rem;
+      color: rgba(255,255,255,0.38);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ── LEAVE A REVIEW ─────────────────────────────────────── */
+    .sg-form-section {
+      padding: 4.5rem 0;
+      border-bottom: 3px solid var(--paper);
+    }
+
+    .sg-form-wrapper {
+      margin-top: 2rem;
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      border: 3px solid var(--paper);
+    }
+
+    .sg-form-main { padding: 2.2rem; border-right: 3px solid var(--paper); }
+
+    .sg-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 1.8rem;
+    }
+
+    .sg-form-side {
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+
+    .sg-side-note {
+      font-family: var(--font-mono);
+      font-size: 0.56rem;
+      color: rgba(255,255,255,0.26);
+      line-height: 2.1;
+      padding: 0.9rem;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sg-side-note strong {
+      display: block;
+      font-size: 0.46rem;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.42);
+      margin-bottom: 0.5rem;
+    }
+
+    .sg-side-note li {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .sg-side-note li::before {
+      content: '◆';
+      color: var(--amber);
+      flex-shrink: 0;
+    }
+
+    .sg-feedback {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-top: 0.9rem;
+      padding: 0.55rem 0.75rem;
+      border: 1px solid currentColor;
+      display: none;
+    }
+
+    /* ── CLOSING CTA ────────────────────────────────────────── */
+    .sg-cta {
+      padding: 6rem 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Dot grid behind CTA */
+    .sg-cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+      background-size: 10px 10px;
+      pointer-events: none;
+    }
+
+    /* Amber glow — matches rest of site brand */
+    .sg-cta::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 50%,
+        rgba(212,168,67,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .sg-cta-inner {
+      position: relative;
+      z-index: 10;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .sg-cta-label {
+      font-family: var(--font-mono);
+      font-size: 0.52rem;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: rgba(var(--blue-rgb), 0.55);
+      margin-bottom: 2rem;
+    }
+
+    .sg-cta-heading {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 5vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--paper);
+      line-height: 1.05;
+      margin: 0 0 1rem;
+    }
+
+    .sg-cta-heading em {
+      font-style: normal;
+      background: var(--paper);
+      color: var(--ink);
+      padding: 0.04em 0.18em;
+      display: inline-block;
+      transform: skewX(-2deg);
+    }
+
+    .sg-cta-sub {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin: 0 0 2.8rem;
+    }
+
+    .sg-cta-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 920px) {
+      .sg-review-grid { grid-template-columns: 1fr; gap: 1.5px; }
+      .sg-form-wrapper { grid-template-columns: 1fr; }
+      .sg-form-main { border-right: none; border-bottom: 3px solid var(--paper); }
+      .sg-form-grid { grid-template-columns: 1fr; }
+      .sg-map-meta { gap: 1rem; }
+    }
+
+    @media (max-width: 600px) {
+      .sg-hero-title { font-size: clamp(3.8rem, 16vw, 6rem); }
+      .sg-hero-stats { flex-direction: column; gap: 0.6rem; }
+      .sg-hero-stat-sep { display: none; }
+      .sg-card { padding: 1.8rem 1.4rem; }
+      .sg-form-main { padding: 1.6rem 1.2rem; }
+      .sg-map-ui { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+<div id="overlay"></div>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <svg class="logo-sun" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="8" stroke="white" stroke-width="2"/>
+        <line x1="20" y1="2"  x2="20" y2="8"  stroke="white" stroke-width="2"/>
+        <line x1="20" y1="32" x2="20" y2="38" stroke="white" stroke-width="2"/>
+        <line x1="2"  y1="20" x2="8"  y2="20" stroke="white" stroke-width="2"/>
+        <line x1="32" y1="20" x2="38" y2="20" stroke="white" stroke-width="2"/>
+        <line x1="6.7"  y1="6.7"  x2="10.9" y2="10.9" stroke="white" stroke-width="2"/>
+        <line x1="29.1" y1="29.1" x2="33.3" y2="33.3" stroke="white" stroke-width="2"/>
+        <line x1="33.3" y1="6.7"  x2="29.1" y2="10.9" stroke="white" stroke-width="2"/>
+        <line x1="10.9" y1="29.1" x2="6.7"  y2="33.3" stroke="white" stroke-width="2"/>
+      </svg>
+      <div class="logo-text">Reda Essabre<span>☀ Sun Signature</span></div>
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="resume.html">Resume</a>
+      <a href="work.html">Work</a>
+      <a href="signal.html" class="active">Signal</a>
+      <a href="contact.html">Contact</a>
+      <a href="game.html" class="nav-game">▶ PLAY</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============================================================
+     1 · HERO
+     ============================================================ -->
+<section class="sg-hero">
+  <div class="sg-hero-content">
+    <div class="sg-hero-kicker">// Reda Essabre · Global Collaboration · Active</div>
+
+    <h1 class="sg-hero-title">Signal</h1>
+
+    <p class="sg-hero-sub">
+      Trusted collaboration across<br>systems, teams, and borders.
+    </p>
+
+    <div class="sg-hero-rule"></div>
+
+    <div class="sg-hero-stats">
+      <span>10 Cities</span>
+      <span class="sg-hero-stat-sep">·</span>
+      <span>3 Continents</span>
+      <span class="sg-hero-stat-sep">·</span>
+      <span><span id="sg-sig-count">0</span> Active Signals</span>
+      <span class="sg-hero-stat-sep">·</span>
+      <span>6 Verified Reviews</span>
+    </div>
+  </div>
+
+  <div class="sg-scroll-cue">Scroll to explore ↓</div>
+</section>
+
+<!-- ============================================================
+     2 · GLOBAL SIGNAL NETWORK
+     ============================================================ -->
+<section class="sg-map">
+  <canvas id="sg-canvas"></canvas>
+
+  <div class="sg-map-ui">
+    <div class="sg-map-label">// Global Signal Network · Live</div>
+    <div class="sg-map-meta">
+      <span>Nodes: <em>10</em></span>
+      <span>Connections: <em>13</em></span>
+      <span>Status: <em>Active</em></span>
+    </div>
+  </div>
+
+  <div class="sg-tooltip" id="sg-tooltip">City<span>Country</span></div>
+</section>
+
+<!-- ============================================================
+     3 · VERIFIED CLIENT SIGNALS
+     ============================================================ -->
+<section class="sg-reviews">
+  <div class="container">
+
+    <div class="sg-section-header">
+      <span class="section-label">// Verified Client Signals</span>
+      <h2>What Clients Say</h2>
+    </div>
+
+    <div class="sg-review-grid">
+
+      <!-- Card 01 -->
+      <div class="sg-card">
+        <div class="sg-card-geo">Dublin, Ireland</div>
+        <blockquote class="sg-card-quote">
+          "Reda completely transformed how our operations team handles reporting.
+          What used to take three hours each week became a single automated run.
+          His ability to understand what we actually needed — not just what we
+          asked for — made all the difference."
+        </blockquote>
+        <div class="sg-card-rule"></div>
+        <div class="sg-card-name">Sarah Mitchell</div>
+        <div class="sg-card-role">Head of Operations · EduPath Technologies</div>
+      </div>
+
+      <!-- Card 02 -->
+      <div class="sg-card">
+        <div class="sg-card-geo">Paris, France</div>
+        <blockquote class="sg-card-quote">
+          "Working with Reda on the API integration layer was a reminder of what
+          good technical delivery looks like. He didn't just implement what was
+          spec'd — he flagged edge cases, validated the data flow end-to-end,
+          and made sure the system would hold under production load."
+        </blockquote>
+        <div class="sg-card-rule"></div>
+        <div class="sg-card-name">Thomas Renault</div>
+        <div class="sg-card-role">Solutions Architect · Fokal Digital</div>
+      </div>
+
+      <!-- Card 03 -->
+      <div class="sg-card">
+        <div class="sg-card-geo">Manchester, United Kingdom</div>
+        <blockquote class="sg-card-quote">
+          "The automation workflow Reda built for our account management process
+          eliminated an entire category of manual errors. The rule engine handles
+          thousands of events per week without any intervention.
+          Solid ownership from start to finish."
+        </blockquote>
+        <div class="sg-card-rule"></div>
+        <div class="sg-card-name">James Calloway</div>
+        <div class="sg-card-role">VP Technology · Sigma Learning Group</div>
+      </div>
+
+      <!-- Card 04 -->
+      <div class="sg-card">
+        <div class="sg-card-geo">Milan, Italy</div>
+        <blockquote class="sg-card-quote">
+          "Reda is the kind of consultant who goes deep. He didn't just fix the
+          SQL performance issue — he profiled the full query plan, restructured
+          the joins, and documented everything clearly. Our dashboard now loads
+          in under 3 seconds instead of 45+."
+        </blockquote>
+        <div class="sg-card-rule"></div>
+        <div class="sg-card-name">Claire Dupont</div>
+        <div class="sg-card-role">Data Operations Manager · Nexus Finance</div>
+      </div>
+
+      <!-- Card 05 -->
+      <div class="sg-card">
+        <div class="sg-card-geo">La Paz, Bolivia</div>
+        <blockquote class="sg-card-quote">
+          "One of the few consultants who genuinely understands both the business
+          and the technical side. His SSRS reporting work gave our finance team
+          visibility they hadn't had before. Responsive, thorough, and reliable
+          throughout the entire engagement."
+        </blockquote>
+        <div class="sg-card-rule"></div>
+        <div class="sg-card-name">Roberto Salinas</div>
+        <div class="sg-card-role">IT Director · BolData Systems</div>
+      </div>
+
+      <!-- Card 06 -->
+      <div class="sg-card">
+        <div class="sg-card-geo">Ottawa, Canada</div>
+        <blockquote class="sg-card-quote">
+          "Reda handled a complex ERP integration under real pressure — tight
+          timelines, stakeholder dependencies, and tricky data mapping challenges.
+          He resolved issues quickly and kept everyone informed.
+          I wouldn't hesitate to bring him back on the next project."
+        </blockquote>
+        <div class="sg-card-rule"></div>
+        <div class="sg-card-name">Priya Nair</div>
+        <div class="sg-card-role">Implementation Manager · CloudOps Partners</div>
+      </div>
+
+    </div><!-- /.sg-review-grid -->
+  </div>
+</section>
+
+<!-- ============================================================
+     4 · LEAVE A REVIEW
+     ============================================================ -->
+<section class="sg-form-section">
+  <div class="container">
+
+    <div class="sg-section-header">
+      <span class="section-label">// Open Signal · Submit Review</span>
+      <h2>Leave a Signal</h2>
+    </div>
+
+    <div class="sg-form-wrapper">
+
+      <div class="sg-form-main">
+        <div class="sg-form-grid">
+          <div class="form-group">
+            <label class="form-label" for="sg-name">Full Name *</label>
+            <input class="form-control" id="sg-name" type="text"
+                   placeholder="Jane Smith" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sg-role">Role / Title</label>
+            <input class="form-control" id="sg-role" type="text"
+                   placeholder="Head of Operations">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sg-company">Company</label>
+            <input class="form-control" id="sg-company" type="text"
+                   placeholder="Acme Corp">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sg-location">Location</label>
+            <input class="form-control" id="sg-location" type="text"
+                   placeholder="Dublin, Ireland">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="sg-email">Email — private, never displayed</label>
+          <input class="form-control" id="sg-email" type="email"
+                 placeholder="jane@company.com" autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="sg-text">Your Review *</label>
+          <textarea class="form-control" id="sg-text"
+                    style="min-height:148px;"
+                    placeholder="Describe your experience — the engagement, the outcome, and how the collaboration felt..."></textarea>
+        </div>
+
+        <button class="btn btn-filled" id="sg-submit-btn">◆ TRANSMIT SIGNAL</button>
+        <div class="sg-feedback" id="sg-feedback"></div>
+      </div>
+
+      <div class="sg-form-side">
+        <div class="sg-side-note">
+          <strong>// Data policy</strong>
+          <ul>
+            <li>Name & role may appear publicly if approved</li>
+            <li>Email is strictly private — never displayed</li>
+            <li>All reviews moderated before going live</li>
+            <li>Request removal anytime via contact</li>
+          </ul>
+        </div>
+        <div class="sg-side-note">
+          <strong>// Backend ready</strong>
+          <ul>
+            <li>Supabase / Firebase / Airtable</li>
+            <li>Fields: id · name · role · company</li>
+            <li>location · email · text · rating</li>
+            <li>submittedAt · status · source</li>
+          </ul>
+        </div>
+        <a href="contact.html" class="btn" style="text-align:center;justify-content:center;font-size:0.6rem;width:100%;">
+          ◆ Or contact directly
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     5 · CLOSING CTA
+     ============================================================ -->
+<section class="sg-cta">
+  <div class="sg-cta-inner">
+    <div class="sg-cta-label">// Next Step</div>
+    <h2 class="sg-cta-heading" style="border:none;padding:0;margin-bottom:0.6rem;">
+      Let's build systems that<br>
+      <em>scale across borders.</em>
+    </h2>
+    <p class="sg-cta-sub">
+      Data pipelines · Automation workflows · API integrations · Operational reliability
+    </p>
+    <div class="sg-cta-actions">
+      <a href="contact.html" class="btn btn-filled">◆ GET IN TOUCH</a>
+      <a href="work.html"    class="btn">SEE WORK →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <svg viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="8" stroke="white" stroke-width="2"/>
+        <line x1="20" y1="2"  x2="20" y2="8"  stroke="white" stroke-width="2"/>
+        <line x1="20" y1="32" x2="20" y2="38" stroke="white" stroke-width="2"/>
+        <line x1="2"  y1="20" x2="8"  y2="20" stroke="white" stroke-width="2"/>
+        <line x1="32" y1="20" x2="38" y2="20" stroke="white" stroke-width="2"/>
+        <line x1="6.7"  y1="6.7"  x2="10.9" y2="10.9" stroke="white" stroke-width="2"/>
+        <line x1="29.1" y1="29.1" x2="33.3" y2="33.3" stroke="white" stroke-width="2"/>
+        <line x1="33.3" y1="6.7"  x2="29.1" y2="10.9" stroke="white" stroke-width="2"/>
+        <line x1="10.9" y1="29.1" x2="6.7"  y2="33.3" stroke="white" stroke-width="2"/>
+      </svg>
+      <div class="footer-brand-text">
+        <strong>Reda Essabre</strong>
+        © 2025 · France<br>
+        Data Engineer & Automation Expert<br>
+        ☀ Sun Signature
+      </div>
+    </div>
+    <div class="footer-mid"><div class="footer-dither-band"></div></div>
+    <div class="footer-nav">
+      <a href="index.html">Home</a>
+      <a href="resume.html">Resume</a>
+      <a href="work.html">Work</a>
+      <a href="signal.html">Signal</a>
+      <a href="contact.html">Contact</a>
+      <a href="game.html">▶ Play</a>
+      <a href="https://linkedin.com" target="_blank">LinkedIn ↗</a>
+      <a href="https://github.com" target="_blank">GitHub ↗</a>
+    </div>
+  </div>
+</footer>
+
+<!-- EASTER EGG -->
+<div class="modal-backdrop" id="sun-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span>☀ SUN CONSOLE / UNLOCKED</span>
+      <button class="modal-close" onclick="closeModal()">[ × CLOSE ]</button>
+    </div>
+    <div class="modal-body">
+      You typed <strong>SUN</strong>.<br><br>
+      That's the kind of attention to detail I bring to every system I build.<br><br>
+      Hidden signals. Clean outputs. Zero noise.<br><br>
+      <em>"The best automation is the kind you don't notice — until it stops."</em>
+    </div>
+    <div class="modal-footer">
+      <a href="contact.html" class="btn btn-filled" onclick="closeModal()">◆ LET'S TALK →</a>
+    </div>
+  </div>
+</div>
+
+<div class="egg-hint">SECRET: TRY TYPING  S · U · N</div>
+
+<script src="main.js"></script>
+<script src="signal.js"></script>
+</body>
+</html>
