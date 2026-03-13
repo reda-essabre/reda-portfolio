@@ -36,18 +36,7 @@ body {
   cursor: crosshair;
 }
 
-body.is-ready .motion-section,
-body.is-ready .stat-block,
-body.is-ready .award-block,
-body.is-ready .impact-metric,
-body.is-ready .skill-tile,
-body.is-ready .case-card,
-body.is-ready .terminal,
-body.is-ready .philosophy-text,
-body.is-ready .philosophy-sub,
-body.is-ready .footer-brand,
-body.is-ready .footer-nav,
-body.is-ready .footer-mid {
+.motion-pending {
   opacity: 0;
   transform: translateY(36px);
   filter: blur(8px);
@@ -83,7 +72,8 @@ body.is-ready .footer-mid {
 .philosophy-sub.is-visible,
 .footer-brand.is-visible,
 .footer-nav.is-visible,
-.footer-mid.is-visible {
+.footer-mid.is-visible,
+.motion-pending.is-visible {
   opacity: 1;
   transform: translateY(0);
   filter: blur(0);

@@ -92,13 +92,12 @@ function initTerminal() {
 })();
 
 function initMotionSystem() {
-  document.body.classList.add('is-ready');
-
   const revealTargets = document.querySelectorAll(
     '.motion-section, .stat-block, .skill-tile, .case-card, .award-block, .impact-metric, .terminal, .philosophy-text, .philosophy-sub, .footer-brand, .footer-nav, .footer-mid'
   );
 
   revealTargets.forEach((el, index) => {
+    el.classList.add('motion-pending');
     el.style.transitionDelay = `${Math.min(index % 6, 5) * 70}ms`;
   });
 
@@ -114,7 +113,16 @@ function initMotionSystem() {
     rootMargin: '0px 0px -8% 0px'
   });
 
-  revealTargets.forEach((el) => revealObserver.observe(el));
+  revealTargets.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    const inView = rect.top < window.innerHeight * 0.92 && rect.bottom > 0;
+
+    if (inView) {
+      el.classList.add('is-visible');
+    } else {
+      revealObserver.observe(el);
+    }
+  });
 }
 
 function initSpotlights() {
