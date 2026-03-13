@@ -1053,6 +1053,18 @@ h3 {
   color: var(--ink);
 }
 
+.philosophy-band::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg, transparent 0%, rgba(255,255,255,0.08) 42%, rgba(255,255,255,0.22) 50%, rgba(255,255,255,0.08) 58%, transparent 100%);
+  transform: translateX(-60%);
+  animation: philosophySweep 9s linear infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
 /* Deep black left panel like inky corner in screenshot */
 .philosophy-band::before {
   content: '';
@@ -1083,6 +1095,7 @@ h3 {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--paper);
+  animation: philosophyFloat 6s ease-in-out infinite;
 }
 
 .philosophy-sub {
@@ -1091,6 +1104,22 @@ h3 {
   line-height: 1.8;
   color: var(--ink);
   opacity: 0.8;
+  animation: philosophyFadeIn 0.9s ease-out both;
+}
+
+@keyframes philosophySweep {
+  from { transform: translateX(-60%); }
+  to { transform: translateX(60%); }
+}
+
+@keyframes philosophyFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes philosophyFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 0.8; transform: translateY(0); }
 }
 
 /* ============================================================
@@ -1680,6 +1709,12 @@ footer {
     clip-path: none;
     background-size: 5px 5px;
   }
+  .philosophy-band::after {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0) 78%);
+    transform: translateY(-35%);
+    animation: philosophySweepVertical 8s linear infinite;
+  }
   .philosophy-inner {
     grid-template-columns: 1fr;
     gap: 0;
@@ -1693,6 +1728,7 @@ footer {
   }
   .philosophy-sub {
     padding: 1.5rem 1.25rem 1.75rem;
+    animation-delay: 0.12s;
   }
   .stats-strip { grid-template-columns: repeat(2, 1fr); }
   .stat-block:nth-child(2) { border-right: none; }
@@ -1738,11 +1774,15 @@ footer {
   .philosophy-band::before {
     height: 150px;
   }
+  .philosophy-band::after {
+    animation-duration: 10s;
+  }
   .philosophy-text {
     min-height: 150px;
     padding: 1.25rem 1rem;
     font-size: clamp(0.92rem, 5vw, 1.25rem);
     line-height: 1.2;
+    animation-duration: 5.4s;
   }
   .philosophy-sub {
     padding: 1.1rem 1rem 1.4rem;
@@ -1767,4 +1807,9 @@ footer {
   .footer-brand { border-right: none; border-bottom: 3px solid var(--paper); }
   .footer-nav { border-left: none; border-top: 3px solid var(--paper); flex-direction: row; flex-wrap: wrap; gap: 0.75rem; }
   .footer-mid { display: none; }
+}
+
+@keyframes philosophySweepVertical {
+  from { transform: translateY(-35%); }
+  to { transform: translateY(35%); }
 }
