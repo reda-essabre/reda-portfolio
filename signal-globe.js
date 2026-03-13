@@ -1,27 +1,29 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js';
-
-const BLUE = 0x38c5e8;
-const LIME = 0xd6f17e;
-const GLOBE_RADIUS = 1.46;
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
 const CITIES = [
-  { name: 'Paris', country: 'France', lat: 48.8566, lon: 2.3522, priority: true },
-  { name: 'Milan', country: 'Italy', lat: 45.4642, lon: 9.19, priority: false },
-  { name: 'Dublin', country: 'Ireland', lat: 53.3498, lon: -6.2603, priority: true },
-  { name: 'Manchester', country: 'United Kingdom', lat: 53.4808, lon: -2.2426, priority: false },
-  { name: 'London', country: 'United Kingdom', lat: 51.5072, lon: -0.1276, priority: true },
-  { name: 'Ottawa', country: 'Canada', lat: 45.4215, lon: -75.6972, priority: true },
-  { name: 'Calgary', country: 'Canada', lat: 51.0447, lon: -114.0719, priority: false },
-  { name: 'La Paz', country: 'Bolivia', lat: -16.4897, lon: -68.1193, priority: true },
-  { name: 'Santa Cruz', country: 'Bolivia', lat: -17.8146, lon: -63.1561, priority: false },
-  { name: 'Cochabamba', country: 'Bolivia', lat: -17.3895, lon: -66.1568, priority: false }
+  { name: 'Paris', country: 'France', lat: 48.8566, lon: 2.3522 },
+  { name: 'Milan', country: 'Italy', lat: 45.4642, lon: 9.19 },
+  { name: 'Dublin', country: 'Ireland', lat: 53.3498, lon: -6.2603 },
+  { name: 'Manchester', country: 'United Kingdom', lat: 53.4808, lon: -2.2426 },
+  { name: 'London', country: 'United Kingdom', lat: 51.5072, lon: -0.1276 },
+  { name: 'Ottawa', country: 'Canada', lat: 45.4215, lon: -75.6972 },
+  { name: 'Calgary', country: 'Canada', lat: 51.0447, lon: -114.0719 },
+  { name: 'La Paz', country: 'Bolivia', lat: -16.4897, lon: -68.1193 },
+  { name: 'Santa Cruz', country: 'Bolivia', lat: -17.8146, lon: -63.1561 },
+  { name: 'Cochabamba', country: 'Bolivia', lat: -17.3895, lon: -66.1568 }
 ];
 
 const CONNECTIONS = [
   [4, 0], [4, 2], [4, 3], [0, 1], [2, 0],
   [4, 5], [0, 5], [5, 6], [5, 7], [6, 7],
   [7, 8], [7, 9], [8, 9], [0, 7]
+];
+
+const COUNTRY_LABELS = [
+  { text: 'FRANCE', lat: 48.8566, lon: 2.3522 },
+  { text: 'ITALY', lat: 45.4642, lon: 9.19 },
+  { text: 'IRELAND', lat: 53.3498, lon: -6.2603 },
+  { text: 'UK', lat: 52.2, lon: -1.9 },
+  { text: 'CANADA', lat: 50.5, lon: -96.0 },
+  { text: 'BOLIVIA', lat: -17.2, lon: -65.8 }
 ];
 
 const LAND = [
@@ -35,510 +37,362 @@ const LAND = [
   [[70,30],[68,40],[65,60],[62,75],[60,90],[58,100],[56,120],[55,130],[52,140],[50,140],[48,136],[44,132],[40,140],[38,142],[36,138],[32,130],[28,122],[24,120],[22,114],[18,110],[14,108],[10,105],[6,104],[2,104],[0,104],[0,108],[4,108],[6,116],[-4,116],[-8,115],[-8,118],[0,110],[6,100],[10,100],[14,98],[16,94],[18,92],[20,90],[22,88],[22,80],[20,74],[18,74],[14,74],[10,76],[8,77],[10,78],[14,78],[18,74],[22,74],[22,68],[24,62],[26,56],[28,50],[30,48],[32,44],[34,40],[36,36],[38,36],[40,40],[42,36],[44,38],[46,34],[46,30],[48,34],[50,36],[52,42],[54,38],[56,36],[58,36],[60,44],[62,50],[65,60],[68,40],[70,30]]
 ];
 
-function latLonToVector3(lat, lon, radius = GLOBE_RADIUS) {
-  const phi = THREE.MathUtils.degToRad(90 - lat);
-  const theta = THREE.MathUtils.degToRad(lon + 180);
-  return new THREE.Vector3(
-    -(radius * Math.sin(phi) * Math.cos(theta)),
-    radius * Math.cos(phi),
-    radius * Math.sin(phi) * Math.sin(theta)
-  );
-}
-
-function latLonToCanvas(lat, lon, width, height) {
-  return {
-    x: ((lon + 180) / 360) * width,
-    y: ((90 - lat) / 180) * height
-  };
-}
-
-function drawPolygon(ctx, polygon, width, height, fillStyle, strokeStyle) {
-  ctx.beginPath();
-  polygon.forEach(([lat, lon], index) => {
-    const point = latLonToCanvas(lat, lon, width, height);
-    if (index === 0) ctx.moveTo(point.x, point.y);
-    else ctx.lineTo(point.x, point.y);
-  });
-  ctx.closePath();
-  ctx.fillStyle = fillStyle;
-  ctx.fill();
-  if (strokeStyle) {
-    ctx.strokeStyle = strokeStyle;
-    ctx.lineWidth = 1.1;
-    ctx.stroke();
+function greatCircle(lat1, lon1, lat2, lon2, steps) {
+  const toRad = x => x * Math.PI / 180;
+  const a1 = toRad(lat1), b1 = toRad(lon1);
+  const a2 = toRad(lat2), b2 = toRad(lon2);
+  const v1 = [Math.cos(a1) * Math.cos(b1), Math.cos(a1) * Math.sin(b1), Math.sin(a1)];
+  const v2 = [Math.cos(a2) * Math.cos(b2), Math.cos(a2) * Math.sin(b2), Math.sin(a2)];
+  const dot = Math.max(-1, Math.min(1, v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]));
+  const angle = Math.acos(dot);
+  if (angle < 0.0001) return [[lat1, lon1]];
+  const sinA = Math.sin(angle);
+  const pts = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const wa = Math.sin((1 - t) * angle) / sinA;
+    const wb = Math.sin(t * angle) / sinA;
+    const x = wa * v1[0] + wb * v2[0];
+    const y = wa * v1[1] + wb * v2[1];
+    const z = wa * v1[2] + wb * v2[2];
+    pts.push([
+      Math.atan2(z, Math.sqrt(x * x + y * y)) * 180 / Math.PI,
+      Math.atan2(y, x) * 180 / Math.PI
+    ]);
   }
+  return pts;
 }
 
-function makeEarthTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 2048;
-  canvas.height = 1024;
-  const ctx = canvas.getContext('2d');
-
-  const ocean = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  ocean.addColorStop(0, '#09111d');
-  ocean.addColorStop(0.48, '#030812');
-  ocean.addColorStop(1, '#02050b');
-  ctx.fillStyle = ocean;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  const glow = ctx.createRadialGradient(canvas.width * 0.42, canvas.height * 0.38, 10, canvas.width * 0.5, canvas.height * 0.52, canvas.width * 0.58);
-  glow.addColorStop(0, 'rgba(61,122,255,0.18)');
-  glow.addColorStop(0.45, 'rgba(21,53,104,0.1)');
-  glow.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  ctx.strokeStyle = 'rgba(110,160,255,0.07)';
-  ctx.lineWidth = 1;
-  for (let x = 0; x <= canvas.width; x += 128) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, canvas.height);
-    ctx.stroke();
-  }
-  for (let y = 0; y <= canvas.height; y += 128) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(canvas.width, y);
-    ctx.stroke();
-  }
-
-  LAND.forEach(shape => drawPolygon(ctx, shape, canvas.width, canvas.height, 'rgba(98,118,146,0.26)', 'rgba(185,214,255,0.08)'));
-
-  for (let i = 0; i < 1200; i++) {
-    const x = (i * 173) % canvas.width;
-    const y = (i * 97) % canvas.height;
-    const alpha = ((i % 7) / 7) * 0.03;
-    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
-    ctx.fillRect(x, y, 1, 1);
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 8;
-  return texture;
-}
-
-function makeEmissiveTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 2048;
-  canvas.height = 1024;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  const lightClusters = [
-    [51.5, -0.1, 24], [48.85, 2.35, 20], [45.46, 9.19, 18], [53.35, -6.26, 14],
-    [45.42, -75.69, 18], [43.65, -79.38, 22], [40.71, -74.0, 26], [51.04, -114.07, 14],
-    [-16.5, -68.15, 10], [-17.81, -63.15, 11], [-17.39, -66.16, 9], [52.52, 13.4, 15]
-  ];
-
-  lightClusters.forEach(([lat, lon, radius], index) => {
-    const point = latLonToCanvas(lat, lon, canvas.width, canvas.height);
-    const grad = ctx.createRadialGradient(point.x, point.y, 0, point.x, point.y, radius);
-    grad.addColorStop(0, index % 3 === 0 ? 'rgba(200,230,255,0.95)' : 'rgba(74,171,255,0.8)');
-    grad.addColorStop(0.35, 'rgba(74,171,255,0.22)');
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 8;
-  return texture;
-}
-
-function makeGlowTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 128;
-  canvas.height = 128;
-  const ctx = canvas.getContext('2d');
-  const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-  grad.addColorStop(0, 'rgba(255,255,255,1)');
-  grad.addColorStop(0.28, 'rgba(128,216,255,0.9)');
-  grad.addColorStop(0.55, 'rgba(56,197,232,0.28)');
-  grad.addColorStop(1, 'rgba(56,197,232,0)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 128, 128);
-  return new THREE.CanvasTexture(canvas);
-}
-
-function makeAtmosphereMaterial() {
-  return new THREE.ShaderMaterial({
-    uniforms: {
-      glowColor: { value: new THREE.Color(0x5ad7ff) },
-      viewVector: { value: new THREE.Vector3(0, 0, 5) }
-    },
-    vertexShader: `
-      varying vec3 vNormal;
-      varying vec3 vWorldPosition;
-      void main() {
-        vNormal = normalize(normalMatrix * normal);
-        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-        vWorldPosition = worldPosition.xyz;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-    fragmentShader: `
-      uniform vec3 glowColor;
-      uniform vec3 viewVector;
-      varying vec3 vNormal;
-      varying vec3 vWorldPosition;
-      void main() {
-        vec3 worldNormal = normalize(vNormal);
-        vec3 viewDir = normalize(viewVector - vWorldPosition);
-        float fresnel = pow(1.0 - max(dot(worldNormal, viewDir), 0.0), 2.6);
-        float intensity = fresnel * 0.72;
-        gl_FragColor = vec4(glowColor, intensity * 0.55);
-      }
-    `,
-    side: THREE.BackSide,
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
-  });
-}
-
-function makeRing(radiusMultiplier, color, start, end, tiltX, tiltZ) {
-  const curve = new THREE.EllipseCurve(0, 0, GLOBE_RADIUS * radiusMultiplier, GLOBE_RADIUS * radiusMultiplier, start, end, false, 0);
-  const points = curve.getPoints(180).map(p => new THREE.Vector3(p.x, p.y, 0));
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-  const material = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.7 });
-  const line = new THREE.Line(geometry, material);
-  line.rotation.x = tiltX;
-  line.rotation.z = tiltZ;
-  return line;
-}
-
-function buildRoute(startCity, endCity, color) {
-  const start = latLonToVector3(startCity.lat, startCity.lon, GLOBE_RADIUS + 0.02);
-  const end = latLonToVector3(endCity.lat, endCity.lon, GLOBE_RADIUS + 0.02);
-  const altitude = 0.32 + start.clone().angleTo(end) * 0.22;
-  const mid = start.clone().add(end).multiplyScalar(0.5).normalize().multiplyScalar(GLOBE_RADIUS + altitude);
-  const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
-  const geometry = new THREE.TubeGeometry(curve, 90, 0.006, 8, false);
-  const material = new THREE.MeshBasicMaterial({
-    color,
-    transparent: true,
-    opacity: 0.34,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
-  });
-  const mesh = new THREE.Mesh(geometry, material);
-
-  const pulse = new THREE.Mesh(
-    new THREE.SphereGeometry(0.022, 12, 12),
-    new THREE.MeshBasicMaterial({ color: 0xdaf6ff, transparent: true, opacity: 0.92 })
-  );
-  const halo = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: makeGlowTexture(),
-    color,
-    transparent: true,
-    opacity: 0.5,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending
-  }));
-  halo.scale.setScalar(0.18);
-  pulse.add(halo);
-
-  return {
-    curve,
-    mesh,
-    pulse,
-    nodes: new Set([startCity.name, endCity.name]),
-    speed: reducedMotion ? 0 : 0.045 + Math.random() * 0.028,
-    offset: Math.random(),
-    material,
-    baseColor: color
-  };
-}
-
-function projectToScreen(object, camera, width, height) {
-  const vector = object.getWorldPosition(new THREE.Vector3()).project(camera);
-  return {
-    x: (vector.x * 0.5 + 0.5) * width,
-    y: (-vector.y * 0.5 + 0.5) * height,
-    z: vector.z
-  };
-}
-
-function createLabelLayer(container) {
-  const layer = document.createElement('div');
-  layer.className = 'sg-globe-labels';
-  container.appendChild(layer);
-  return layer;
-}
-
-function initGlobe() {
-  const container = document.getElementById('sg-globe-stage');
+function initPixelGlobe() {
+  const stage = document.getElementById('sg-globe-stage');
   const tooltip = document.getElementById('sg-tooltip');
-  if (!container || !tooltip) return;
+  if (!stage || !tooltip) return;
 
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
-  camera.position.set(0, 0.18, 5.25);
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  stage.appendChild(canvas);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
-  container.appendChild(renderer.domElement);
+  const buffer = document.createElement('canvas');
+  const bctx = buffer.getContext('2d');
+  bctx.imageSmoothingEnabled = false;
 
-  const labelLayer = createLabelLayer(container);
-  const clock = new THREE.Clock();
-  const pointer = new THREE.Vector2();
-  const pointerTarget = new THREE.Vector2();
-  const raycaster = new THREE.Raycaster();
-  const hoverTargets = [];
-  const labels = [];
+  const labelsLayer = document.createElement('div');
+  labelsLayer.className = 'sg-globe-labels';
+  stage.appendChild(labelsLayer);
 
-  const globeRig = new THREE.Group();
-  const globeGroup = new THREE.Group();
-  scene.add(globeRig);
-  globeRig.add(globeGroup);
-
-  const starGeometry = new THREE.BufferGeometry();
-  const starVertices = [];
-  for (let i = 0; i < 900; i++) {
-    const radius = 9 + (i % 11) * 0.08;
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos((Math.random() * 2) - 1);
-    starVertices.push(
-      radius * Math.sin(phi) * Math.cos(theta),
-      radius * Math.cos(phi),
-      radius * Math.sin(phi) * Math.sin(theta)
-    );
-  }
-  starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-  const stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ color: 0xbfd8ff, size: 0.015, transparent: true, opacity: 0.45 }));
-  scene.add(stars);
-
-  scene.add(new THREE.HemisphereLight(0x9bbcff, 0x020406, 0.58));
-  const keyLight = new THREE.DirectionalLight(0xa9d7ff, 1.55);
-  keyLight.position.set(-2.8, 1.8, 3.6);
-  scene.add(keyLight);
-  const rimLight = new THREE.DirectionalLight(0x62d5ff, 1.1);
-  rimLight.position.set(2.4, -0.4, 2.2);
-  scene.add(rimLight);
-
-  const earthTexture = makeEarthTexture();
-  const emissiveTexture = makeEmissiveTexture();
-  const globe = new THREE.Mesh(
-    new THREE.SphereGeometry(GLOBE_RADIUS, 96, 96),
-    new THREE.MeshStandardMaterial({
-      map: earthTexture,
-      emissiveMap: emissiveTexture,
-      emissive: new THREE.Color(0x4f9dff),
-      emissiveIntensity: 0.45,
-      roughness: 0.9,
-      metalness: 0.05,
-      transparent: true,
-      opacity: 0.98
-    })
-  );
-  globeGroup.add(globe);
-
-  const atmosphere = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_RADIUS * 1.045, 80, 80), makeAtmosphereMaterial());
-  globeGroup.add(atmosphere);
-
-  const innerGlow = new THREE.Mesh(
-    new THREE.SphereGeometry(GLOBE_RADIUS * 1.005, 48, 48),
-    new THREE.MeshBasicMaterial({ color: 0x2d72ff, transparent: true, opacity: 0.045, side: THREE.BackSide })
-  );
-  globeGroup.add(innerGlow);
-
-  const ringsGroup = new THREE.Group();
-  ringsGroup.add(makeRing(1.18, BLUE, 3.85, 5.38, 0.26, -0.34));
-  ringsGroup.add(makeRing(1.22, LIME, 5.82, 0.54, -0.22, 0.12));
-  ringsGroup.add(makeRing(1.27, BLUE, 0.14, 2.16, 0.44, 0.52));
-  ringsGroup.add(makeRing(1.27, LIME, 2.72, 3.7, -0.48, -0.16));
-  globeRig.add(ringsGroup);
-
-  const routeGroup = new THREE.Group();
-  globeGroup.add(routeGroup);
-  const routes = CONNECTIONS.map((pair, index) => {
-    const route = buildRoute(CITIES[pair[0]], CITIES[pair[1]], index % 4 === 0 ? LIME : BLUE);
-    routeGroup.add(route.mesh);
-    routeGroup.add(route.pulse);
-    return route;
+  const labelEls = COUNTRY_LABELS.map(label => {
+    const el = document.createElement('div');
+    el.className = 'sg-globe-label';
+    el.textContent = label.text;
+    labelsLayer.appendChild(el);
+    return { ...label, el };
   });
 
-  const glowTexture = makeGlowTexture();
-  const nodeGroup = new THREE.Group();
-  globeGroup.add(nodeGroup);
-  const nodes = CITIES.map(city => {
-    const position = latLonToVector3(city.lat, city.lon, GLOBE_RADIUS + 0.02);
-    const marker = new THREE.Group();
-    marker.position.copy(position);
-    marker.lookAt(position.clone().multiplyScalar(2));
+  const routeData = CONNECTIONS.map((pair, index) => ({
+    pair,
+    points: greatCircle(CITIES[pair[0]].lat, CITIES[pair[0]].lon, CITIES[pair[1]].lat, CITIES[pair[1]].lon, 72),
+    speed: 0.0017 + (index % 4) * 0.00035,
+    offset: index * 0.13
+  }));
 
-    const core = new THREE.Mesh(new THREE.SphereGeometry(0.025, 16, 16), new THREE.MeshBasicMaterial({ color: 0xf4fbff }));
-    const halo = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: glowTexture,
-      color: BLUE,
-      transparent: true,
-      opacity: 0.58,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending
-    }));
-    halo.scale.setScalar(city.priority ? 0.28 : 0.22);
+  let displayW = 0;
+  let displayH = 0;
+  let rotLon = -28;
+  const rotLat = 18;
+  let globeR = 0;
+  let globeCX = 0;
+  let globeCY = 0;
+  let hoveredCity = -1;
+  let projectedCities = [];
+  const pointer = { x: 0, y: 0, active: false };
 
-    const hitArea = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 10), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }));
-    hitArea.userData.city = city;
+  function resize() {
+    displayW = stage.clientWidth;
+    displayH = stage.clientHeight;
+    canvas.width = displayW;
+    canvas.height = displayH;
+    buffer.width = Math.max(240, Math.round(displayW / 4));
+    buffer.height = Math.max(180, Math.round(displayH / 4));
+  }
 
-    marker.add(halo);
-    marker.add(core);
-    marker.add(hitArea);
-    nodeGroup.add(marker);
-    hoverTargets.push(hitArea);
+  function ortho(lat, lon) {
+    const phi = lat * Math.PI / 180;
+    const lambda = (lon - rotLon) * Math.PI / 180;
+    const phi0 = rotLat * Math.PI / 180;
+    const cosC = Math.sin(phi0) * Math.sin(phi) + Math.cos(phi0) * Math.cos(phi) * Math.cos(lambda);
+    if (cosC < 0) return null;
+    return {
+      x: globeCX + globeR * Math.cos(phi) * Math.sin(lambda),
+      y: globeCY - globeR * (Math.cos(phi0) * Math.sin(phi) - Math.sin(phi0) * Math.cos(phi) * Math.cos(lambda)),
+      depth: cosC
+    };
+  }
 
-    let labelEl = null;
-    if (city.priority) {
-      labelEl = document.createElement('div');
-      labelEl.className = 'sg-globe-label';
-      labelEl.textContent = city.name;
-      labelLayer.appendChild(labelEl);
-      labels.push({ el: labelEl, marker, city });
+  function drawBackground(time) {
+    bctx.fillStyle = '#000';
+    bctx.fillRect(0, 0, buffer.width, buffer.height);
+
+    bctx.fillStyle = 'rgba(255,255,255,0.06)';
+    for (let y = 0; y < buffer.height; y += 5) {
+      for (let x = (y % 10 === 0 ? 0 : 2); x < buffer.width; x += 5) {
+        bctx.fillRect(x, y, 1, 1);
+      }
     }
 
-    return { city, marker, halo, core, hitArea };
-  });
+    const halo = bctx.createRadialGradient(globeCX, globeCY, globeR * 0.3, globeCX, globeCY, globeR * 1.45);
+    halo.addColorStop(0, 'rgba(56,197,232,0.18)');
+    halo.addColorStop(0.5, 'rgba(56,197,232,0.06)');
+    halo.addColorStop(1, 'rgba(0,0,0,0)');
+    bctx.fillStyle = halo;
+    bctx.beginPath();
+    bctx.arc(globeCX, globeCY, globeR * 1.45, 0, Math.PI * 2);
+    bctx.fill();
 
-  const counts = {
-    nodes: document.querySelector('[data-sg-count="nodes"]'),
-    connections: document.querySelector('[data-sg-count="connections"]')
-  };
-  if (counts.nodes) counts.nodes.textContent = String(CITIES.length);
-  if (counts.connections) counts.connections.textContent = String(CONNECTIONS.length);
+    const sweepY = (time * 0.02) % buffer.height;
+    bctx.fillStyle = 'rgba(255,255,255,0.05)';
+    bctx.fillRect(0, Math.floor(sweepY), buffer.width, 1);
+  }
 
-  let hovered = null;
+  function drawRings() {
+    bctx.strokeStyle = 'rgba(56,197,232,0.55)';
+    bctx.lineWidth = 1;
+    bctx.beginPath();
+    bctx.arc(globeCX, globeCY, globeR * 1.18, Math.PI * 0.16, Math.PI * 0.62);
+    bctx.stroke();
+
+    bctx.strokeStyle = 'rgba(212,168,67,0.55)';
+    bctx.beginPath();
+    bctx.arc(globeCX, globeCY, globeR * 1.24, Math.PI * 0.86, Math.PI * 1.34);
+    bctx.stroke();
+
+    bctx.strokeStyle = 'rgba(56,197,232,0.36)';
+    bctx.beginPath();
+    bctx.arc(globeCX, globeCY, globeR * 1.28, Math.PI * 1.08, Math.PI * 1.68);
+    bctx.stroke();
+  }
+
+  function drawSphere() {
+    bctx.save();
+    bctx.beginPath();
+    bctx.arc(globeCX, globeCY, globeR, 0, Math.PI * 2);
+    bctx.clip();
+
+    const ocean = bctx.createRadialGradient(globeCX - globeR * 0.22, globeCY - globeR * 0.26, 4, globeCX, globeCY, globeR);
+    ocean.addColorStop(0, 'rgba(20,34,58,1)');
+    ocean.addColorStop(0.55, 'rgba(5,10,20,1)');
+    ocean.addColorStop(1, 'rgba(2,4,8,1)');
+    bctx.fillStyle = ocean;
+    bctx.fillRect(globeCX - globeR, globeCY - globeR, globeR * 2, globeR * 2);
+
+    bctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    bctx.lineWidth = 1;
+    for (let lat = -60; lat <= 90; lat += 30) {
+      bctx.beginPath();
+      let first = true;
+      for (let lon = -180; lon <= 180; lon += 4) {
+        const p = ortho(lat, lon);
+        if (!p) { first = true; continue; }
+        const px = Math.round(p.x);
+        const py = Math.round(p.y);
+        if (first) bctx.moveTo(px, py);
+        else bctx.lineTo(px, py);
+        first = false;
+      }
+      bctx.stroke();
+    }
+
+    for (let lon = -180; lon < 180; lon += 30) {
+      bctx.beginPath();
+      let first = true;
+      for (let lat = -90; lat <= 90; lat += 4) {
+        const p = ortho(lat, lon);
+        if (!p) { first = true; continue; }
+        const px = Math.round(p.x);
+        const py = Math.round(p.y);
+        if (first) bctx.moveTo(px, py);
+        else bctx.lineTo(px, py);
+        first = false;
+      }
+      bctx.stroke();
+    }
+
+    LAND.forEach(shape => {
+      bctx.beginPath();
+      let started = false;
+      shape.forEach(([lat, lon]) => {
+        const p = ortho(lat, lon);
+        if (!p) { started = false; return; }
+        const px = Math.round(p.x);
+        const py = Math.round(p.y);
+        if (!started) {
+          bctx.moveTo(px, py);
+          started = true;
+        } else {
+          bctx.lineTo(px, py);
+        }
+      });
+      bctx.closePath();
+      bctx.fillStyle = 'rgba(220,228,245,0.18)';
+      bctx.fill();
+      bctx.strokeStyle = 'rgba(255,255,255,0.16)';
+      bctx.stroke();
+    });
+
+    bctx.restore();
+
+    bctx.strokeStyle = 'rgba(56,197,232,0.24)';
+    bctx.lineWidth = 1;
+    bctx.beginPath();
+    bctx.arc(globeCX, globeCY, globeR, 0, Math.PI * 2);
+    bctx.stroke();
+  }
+
+  function drawRoutes(time) {
+    routeData.forEach((route, routeIndex) => {
+      const active = hoveredCity >= 0 && route.pair.includes(hoveredCity);
+      bctx.strokeStyle = active ? 'rgba(255,255,255,0.9)' : 'rgba(56,197,232,0.42)';
+      bctx.lineWidth = 1;
+      bctx.beginPath();
+      let first = true;
+      route.points.forEach(([lat, lon]) => {
+        const p = ortho(lat, lon);
+        if (!p) { first = true; return; }
+        const px = Math.round(p.x);
+        const py = Math.round(p.y);
+        if (first) bctx.moveTo(px, py);
+        else bctx.lineTo(px, py);
+        first = false;
+      });
+      bctx.stroke();
+
+      const packetIndex = Math.floor(((time * route.speed + route.offset) % 1) * route.points.length);
+      const packet = route.points[packetIndex];
+      const pp = ortho(packet[0], packet[1]);
+      if (pp) {
+        bctx.fillStyle = active ? '#ffffff' : '#38c5e8';
+        bctx.fillRect(Math.round(pp.x) - 1, Math.round(pp.y) - 1, 3, 3);
+      }
+
+      if (routeIndex % 3 === 0 && pp) {
+        bctx.fillStyle = 'rgba(212,168,67,0.9)';
+        bctx.fillRect(Math.round(pp.x) + 3, Math.round(pp.y), 1, 1);
+      }
+    });
+  }
+
+  function drawNodes(time) {
+    projectedCities = CITIES.map(city => {
+      const p = ortho(city.lat, city.lon);
+      return p ? { ...p, city } : null;
+    });
+
+    projectedCities.forEach((point, index) => {
+      if (!point) return;
+      const active = index === hoveredCity;
+      const pulse = 1 + Math.sin(time * 0.003 + index) * 0.3;
+      const size = active ? 5 : 3;
+      const x = Math.round(point.x);
+      const y = Math.round(point.y);
+
+      bctx.fillStyle = active ? 'rgba(255,255,255,0.35)' : 'rgba(56,197,232,0.22)';
+      bctx.fillRect(x - Math.round(3 * pulse), y - Math.round(3 * pulse), Math.round(6 * pulse), Math.round(6 * pulse));
+      bctx.fillStyle = '#ffffff';
+      bctx.fillRect(x - 1, y - 1, size, size);
+      if (active) {
+        bctx.strokeStyle = 'rgba(212,168,67,0.95)';
+        bctx.strokeRect(x - 4, y - 4, 9, 9);
+      }
+    });
+  }
+
+  function updateLabels() {
+    const scaleX = displayW / buffer.width;
+    const scaleY = displayH / buffer.height;
+    labelEls.forEach(label => {
+      const p = ortho(label.lat, label.lon);
+      if (!p || p.depth < 0.18) {
+        label.el.classList.remove('visible', 'is-active');
+        return;
+      }
+      label.el.style.left = `${Math.round(p.x * scaleX)}px`;
+      label.el.style.top = `${Math.round(p.y * scaleY) - 18}px`;
+      label.el.classList.add('visible');
+      const active = hoveredCity >= 0 && CITIES[hoveredCity].country.toUpperCase().includes(label.text.replace('UK', 'UNITED KINGDOM'));
+      label.el.classList.toggle('is-active', active);
+    });
+  }
+
+  function paint(time) {
+    globeR = Math.min(buffer.width * 0.23, buffer.height * 0.35);
+    globeCX = buffer.width * 0.52;
+    globeCY = buffer.height * 0.52;
+    rotLon += 0.035;
+
+    drawBackground(time);
+    drawRings();
+    drawSphere();
+    drawRoutes(time);
+    drawNodes(time);
+
+    ctx.clearRect(0, 0, displayW, displayH);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(buffer, 0, 0, displayW, displayH);
+    updateLabels();
+    requestAnimationFrame(paint);
+  }
 
   function updateHover(clientX, clientY) {
-    const rect = renderer.domElement.getBoundingClientRect();
-    pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
-    raycaster.setFromCamera(pointer, camera);
-    const hit = raycaster.intersectObjects(hoverTargets, false)[0];
-    hovered = hit ? hit.object.userData.city.name : null;
+    const rect = stage.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    const scaleX = buffer.width / displayW;
+    const scaleY = buffer.height / displayH;
+    const bx = x * scaleX;
+    const by = y * scaleY;
 
-    if (!hovered) {
+    let found = -1;
+    projectedCities.forEach((point, index) => {
+      if (!point) return;
+      if (Math.hypot(point.x - bx, point.y - by) < 8) found = index;
+    });
+    hoveredCity = found;
+
+    if (found === -1) {
       tooltip.classList.remove('visible');
-      container.style.cursor = 'default';
+      stage.style.cursor = 'default';
       return;
     }
 
-    const node = nodes.find(item => item.city.name === hovered);
-    const screen = projectToScreen(node.marker, camera, rect.width, rect.height);
-    tooltip.innerHTML = `${node.city.name}<span>${node.city.country}</span>`;
-    tooltip.style.left = `${screen.x + 18}px`;
-    tooltip.style.top = `${screen.y - 18}px`;
+    const city = CITIES[found];
+    tooltip.innerHTML = `${city.country}<span>${city.name}</span>`;
+    tooltip.style.left = `${x + 16}px`;
+    tooltip.style.top = `${y - 42}px`;
     tooltip.classList.add('visible');
-    container.style.cursor = 'pointer';
+    stage.style.cursor = 'pointer';
   }
 
-  function clearHover() {
-    hovered = null;
+  stage.addEventListener('mousemove', e => updateHover(e.clientX, e.clientY));
+  stage.addEventListener('mouseleave', () => {
+    hoveredCity = -1;
     tooltip.classList.remove('visible');
-    container.style.cursor = 'default';
-  }
-
-  container.addEventListener('mousemove', event => {
-    const rect = container.getBoundingClientRect();
-    pointerTarget.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    pointerTarget.y = ((event.clientY - rect.top) / rect.height) * 2 - 1;
-    updateHover(event.clientX, event.clientY);
+    stage.style.cursor = 'default';
   });
-
-  container.addEventListener('mouseleave', () => {
-    pointerTarget.set(0, 0);
-    clearHover();
-  });
-
-  container.addEventListener('touchstart', event => {
-    const touch = event.touches[0];
-    if (!touch) return;
-    updateHover(touch.clientX, touch.clientY);
+  stage.addEventListener('touchstart', e => {
+    const touch = e.touches[0];
+    if (touch) updateHover(touch.clientX, touch.clientY);
   }, { passive: true });
 
-  function resize() {
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-    renderer.setSize(width, height, false);
-  }
+  const connectionsEl = document.querySelector('[data-sg-count="connections"]');
+  if (connectionsEl) connectionsEl.textContent = String(CONNECTIONS.length);
+
   resize();
   window.addEventListener('resize', resize, { passive: true });
-
-  function render() {
-    const elapsed = clock.getElapsedTime();
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-
-    if (!reducedMotion) globeGroup.rotation.y += 0.0018;
-    globeRig.rotation.x = THREE.MathUtils.lerp(globeRig.rotation.x, pointerTarget.y * 0.18, 0.045);
-    globeRig.rotation.z = THREE.MathUtils.lerp(globeRig.rotation.z, -pointerTarget.x * 0.18, 0.045);
-    camera.position.x = THREE.MathUtils.lerp(camera.position.x, pointerTarget.x * 0.18, 0.03);
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, 0.18 + pointerTarget.y * 0.08, 0.03);
-    camera.lookAt(0, 0, 0);
-
-    ringsGroup.rotation.y = elapsed * 0.06;
-    ringsGroup.rotation.x = Math.sin(elapsed * 0.18) * 0.04;
-
-    nodes.forEach(node => {
-      const active = hovered === node.city.name;
-      const linked = hovered ? CONNECTIONS.some(pair => {
-        const a = CITIES[pair[0]].name;
-        const b = CITIES[pair[1]].name;
-        return (a === hovered && b === node.city.name) || (b === hovered && a === node.city.name);
-      }) : false;
-      node.halo.material.opacity = active ? 0.92 : linked ? 0.75 : node.city.priority ? 0.58 : 0.35;
-      const scale = active ? 0.34 : linked ? 0.28 : node.city.priority ? 0.28 : 0.22;
-      node.halo.scale.setScalar(scale + Math.sin(elapsed * 2.2 + node.city.lat) * 0.01);
-      node.core.scale.setScalar(active ? 1.5 : linked ? 1.2 : 1);
-    });
-
-    routes.forEach(route => {
-      const pulsePos = route.curve.getPoint((elapsed * route.speed + route.offset) % 1);
-      route.pulse.position.copy(pulsePos);
-      const active = hovered ? route.nodes.has(hovered) : false;
-      route.material.opacity = active ? 0.78 : hovered ? 0.11 : 0.34;
-      route.material.color.setHex(active ? 0xeaffff : route.baseColor);
-      route.pulse.visible = !reducedMotion;
-      route.pulse.scale.setScalar(active ? 1.25 : 1);
-    });
-
-    labels.forEach(label => {
-      const screen = projectToScreen(label.marker, camera, width, height);
-      const visible = screen.z < 1 && screen.z > -1;
-      label.el.style.left = `${screen.x}px`;
-      label.el.style.top = `${screen.y - 16}px`;
-      label.el.classList.toggle('visible', visible);
-      label.el.classList.toggle('is-active', hovered === label.city.name);
-    });
-
-    if (hovered) {
-      const node = nodes.find(item => item.city.name === hovered);
-      const screen = projectToScreen(node.marker, camera, width, height);
-      tooltip.style.left = `${screen.x + 18}px`;
-      tooltip.style.top = `${screen.y - 18}px`;
-    }
-
-    atmosphere.material.uniforms.viewVector.value.copy(camera.position);
-    renderer.render(scene, camera);
-    requestAnimationFrame(render);
-  }
-
-  requestAnimationFrame(render);
+  requestAnimationFrame(paint);
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initGlobe, { once: true });
+  document.addEventListener('DOMContentLoaded', initPixelGlobe, { once: true });
 } else {
-  initGlobe();
+  initPixelGlobe();
 }

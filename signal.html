@@ -231,6 +231,9 @@
       position: absolute;
       inset: 0;
       z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: opacity 0.18s linear;
     }
 
@@ -238,6 +241,7 @@
       display: block;
       width: 100%;
       height: 100%;
+      image-rendering: pixelated;
     }
 
     .sg-globe-labels {
@@ -255,6 +259,10 @@
       letter-spacing: 0.24em;
       text-transform: uppercase;
       color: rgba(255,255,255,0.72);
+      background: rgba(0,0,0,0.58);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 0.24rem 0.4rem;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
       text-shadow: 0 0 18px rgba(0,0,0,0.8);
       white-space: nowrap;
       opacity: 0;
@@ -713,15 +721,15 @@
      2 · GLOBAL SIGNAL NETWORK
      ============================================================ -->
 <section class="sg-map">
-  <div class="sg-globe-stage" id="sg-globe-stage" aria-label="3D global client network"></div>
+  <div class="sg-globe-stage" id="sg-globe-stage" aria-label="Pixel world signal map"></div>
   <div class="sg-map-vignette" aria-hidden="true"></div>
 
   <div class="sg-map-ui">
-    <div class="sg-map-label">// Global Signal Network · Live</div>
+    <div class="sg-map-label">// World Signal Grid · Active</div>
     <div class="sg-map-meta">
-      <span>Nodes: <em data-sg-count="nodes">10</em></span>
-      <span>Connections: <em data-sg-count="connections">14</em></span>
-      <span>Status: <em>Active</em></span>
+      <span>Countries: <em>6</em></span>
+      <span>Routes: <em data-sg-count="connections">14</em></span>
+      <span>Mode: <em>Online</em></span>
     </div>
   </div>
 
