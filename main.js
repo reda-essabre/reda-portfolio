@@ -91,6 +91,114 @@ function initTerminal() {
   document.addEventListener('DOMContentLoaded', addAtmosphere);
 })();
 
+function initMotionSystem() {
+  document.body.classList.add('is-ready');
+
+  const revealTargets = document.querySelectorAll(
+    '.motion-section, .stat-block, .skill-tile, .case-card, .award-block, .impact-metric, .terminal, .philosophy-text, .philosophy-sub, .footer-brand, .footer-nav, .footer-mid'
+  );
+
+  revealTargets.forEach((el, index) => {
+    el.style.transitionDelay = `${Math.min(index % 6, 5) * 70}ms`;
+  });
+
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.16,
+    rootMargin: '0px 0px -8% 0px'
+  });
+
+  revealTargets.forEach((el) => revealObserver.observe(el));
+}
+
+function initSpotlights() {
+  const spotlightTargets = document.querySelectorAll('.stat-block, .skill-tile, .case-card, .award-block, .impact-metric, .terminal');
+
+  spotlightTargets.forEach((el) => {
+    el.classList.add('has-spotlight');
+
+    el.addEventListener('pointermove', (event) => {
+      const rect = el.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 100;
+      const y = ((event.clientY - rect.top) / rect.height) * 100;
+      el.style.setProperty('--spot-x', `${x}%`);
+      el.style.setProperty('--spot-y', `${y}%`);
+    });
+
+    el.addEventListener('pointerleave', () => {
+      el.style.removeProperty('--spot-x');
+      el.style.removeProperty('--spot-y');
+    });
+  });
+}
+
+function initMagneticButtons() {
+  if (window.matchMedia('(pointer: coarse)').matches) return;
+
+  document.querySelectorAll('.btn, nav a').forEach((el) => {
+    el.addEventListener('pointermove', (event) => {
+      const rect = el.getBoundingClientRect();
+      const x = event.clientX - rect.left - rect.width / 2;
+      const y = event.clientY - rect.top - rect.height / 2;
+      el.style.transform = `translate(${x * 0.08}px, ${y * 0.08}px)`;
+    });
+
+    el.addEventListener('pointerleave', () => {
+      el.style.transform = '';
+    });
+  });
+}
+
+function initHeroParallax() {
+  const hero = document.querySelector('.hero');
+  if (!hero || window.matchMedia('(pointer: coarse)').matches) return;
+
+  let rafId = 0;
+  let targetX = 0;
+  let targetY = 0;
+  let currentX = 0;
+  let currentY = 0;
+
+  function render() {
+    currentX += (targetX - currentX) * 0.12;
+    currentY += (targetY - currentY) * 0.12;
+    hero.style.setProperty('--hero-tilt-x', `${currentX}px`);
+    hero.style.setProperty('--hero-tilt-y', `${currentY}px`);
+
+    if (Math.abs(targetX - currentX) > 0.1 || Math.abs(targetY - currentY) > 0.1) {
+      rafId = requestAnimationFrame(render);
+    } else {
+      rafId = 0;
+    }
+  }
+
+  hero.addEventListener('pointermove', (event) => {
+    const rect = hero.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width - 0.5;
+    const py = (event.clientY - rect.top) / rect.height - 0.5;
+    targetX = px * 18;
+    targetY = py * 14;
+
+    if (!rafId) rafId = requestAnimationFrame(render);
+  });
+
+  hero.addEventListener('pointerleave', () => {
+    targetX = 0;
+    targetY = 0;
+    if (!rafId) rafId = requestAnimationFrame(render);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initTerminal();
+  initMotionSystem();
+  initSpotlights();
+  initMagneticButtons();
+  initHeroParallax();
 });

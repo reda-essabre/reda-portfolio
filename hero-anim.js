@@ -132,6 +132,39 @@
     }
   }
 
+  function drawAmbientDepth(width, height, time) {
+    const gradient = ctx.createRadialGradient(
+      width * 0.72,
+      height * 0.32,
+      0,
+      width * 0.72,
+      height * 0.32,
+      width * 0.7
+    );
+    gradient.addColorStop(0, "rgba(255,255,255,0.08)");
+    gradient.addColorStop(0.35, "rgba(255,255,255,0.03)");
+    gradient.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.strokeStyle = "rgba(255,255,255,0.06)";
+    ctx.lineWidth = 1;
+    for (let x = 0; x < width; x += 36) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+
+    const sweepX = ((time * 0.04) % (width + 180)) - 180;
+    const sweep = ctx.createLinearGradient(sweepX, 0, sweepX + 180, 0);
+    sweep.addColorStop(0, "rgba(255,255,255,0)");
+    sweep.addColorStop(0.5, "rgba(255,255,255,0.06)");
+    sweep.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = sweep;
+    ctx.fillRect(0, 0, width, height);
+  }
+
   function drawVignette(width, height) {
     const g = ctx.createRadialGradient(
       width * 0.5,
@@ -173,12 +206,14 @@
   }
 
   function frame() {
+    const time = performance.now();
     const width = canvas.width / (window.devicePixelRatio || 1);
     const height = canvas.height / (window.devicePixelRatio || 1);
 
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, width, height);
 
+    drawAmbientDepth(width, height, time);
     drawMatrixRain(width, height);
     drawDiagonalStreaks(width, height);
     drawHeroImage(width, height);
