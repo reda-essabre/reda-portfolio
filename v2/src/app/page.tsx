@@ -4,6 +4,7 @@ import { ProofStrip } from "@/components/sections/ProofStrip";
 import { SelectedWork } from "@/components/sections/SelectedWork";
 import { Capabilities } from "@/components/sections/Capabilities";
 import { OperatingModel } from "@/components/sections/OperatingModel";
+import { FinalCTA } from "@/components/sections/FinalCTA";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       <SelectedWork />
       <Capabilities />
       <OperatingModel />
+      <FinalCTA />
     </main>
   );
 }
