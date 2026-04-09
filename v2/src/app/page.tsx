@@ -5,6 +5,7 @@ import { SelectedWork } from "@/components/sections/SelectedWork";
 import { Capabilities } from "@/components/sections/Capabilities";
 import { OperatingModel } from "@/components/sections/OperatingModel";
 import { FinalCTA } from "@/components/sections/FinalCTA";
+import { Footer } from "@/components/sections/Footer";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
       <Capabilities />
       <OperatingModel />
       <FinalCTA />
+      <Footer />
     </main>
   );
 }
