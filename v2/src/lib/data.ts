@@ -190,7 +190,7 @@ export const capabilities: Capability[] = [
 
 // ─── Operating Model ──────────────────────────────────────────────────────────
 export const operatingModel = {
-  quote: "A data service is only useful when people can trust it every day.",
+  quote: "Trust is the operating system behind every successful data platform.",
   process: [
     { step: "01", title: "Understand", detail: "Map operational pain points, data ownership, dependencies, and business context." },
     { step: "02", title: "Design", detail: "Architect the right data service with clear contracts, clean handoffs, and pragmatic controls." },
