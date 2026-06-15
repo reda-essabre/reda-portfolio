@@ -151,10 +151,10 @@ export function Capabilities() {
             className="font-semibold text-[#1d1d1f] mb-12"
             style={{ fontSize: "clamp(36px, 5vw, 64px)", letterSpacing: "-0.04em", lineHeight: 1.05 }}
           >
-            What I build.
+            What I build now.
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {capabilities.map((cap, i) => {
               const Icon = iconMap[cap.icon];
               return (

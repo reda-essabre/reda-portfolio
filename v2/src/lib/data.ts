@@ -36,60 +36,111 @@ export interface CaseStudy {
   id: string;
   category: string;
   outcome: string;
+  period: string;
   title: string;
   description: string;
+  impact: string;
   tags: string[];
   featured?: boolean;
 }
 
 export const caseStudies: CaseStudy[] = [
   {
-    id: "CASE-005",
-    category: "FastAPI · PostgreSQL · AI · Event Systems",
-    outcome: "9-wk build",
-    title: "AI Data-Ops Platform",
+    id: "EXP-001",
+    category: "Thesis SM / Thesis Cloud · Remote",
+    outcome: "-30% response time",
+    period: "Aug 2023 - Present",
+    title: "Senior Data Services Consultant",
     description:
-      "Full system design from event ingestion to LLM integration, with idempotent queuing, RAG, observability dashboard, and AI cost tracking. Production-grade reliability patterns throughout.",
-    tags: ["FastAPI", "PostgreSQL", "Queues", "Idempotency", "RAG", "LLM APIs", "Observability"],
+      "Work on the layer where fragmented workflows, unreliable reporting, disconnected data, and people-held processes become structured operational systems.",
+    impact:
+      "Designed SQL reporting, SSRS dashboards, automation flows, and API integrations that reduced issue response time by 30% and manual errors by 20%.",
+    tags: ["n8n", "data engineering", "reporting architecture", "workflow design", "CI/CD", "Automation"],
     featured: true,
   },
   {
-    id: "CASE-001",
-    category: "SQL · Reporting",
-    outcome: "−3h/wk",
-    title: "Funding Category Extraction Pipeline",
+    id: "EXP-002",
+    category: "Thesis SM / Thesis Cloud · Remote",
+    outcome: "-20% delivery time",
+    period: "Feb 2021 - Aug 2023",
+    title: "Implementation and Data Services Consultant",
     description:
-      "Eliminated 3h/week of manual JSON extraction. SQL pipeline with live dashboard output so analysts could focus on interpretation instead of data wrangling.",
-    tags: ["SQL", "JSON Path", "SSRS", "Dashboard"],
+      "Helped turn complex deployments into repeatable systems by connecting ERP configuration, API connections, SQL outputs, workflow setup, and delivery documentation.",
+    impact:
+      "Improved implementation timelines by 20% and expanded delivery into reporting architecture, data extraction, and automation configuration.",
+    tags: ["ERP configuration", "SQL reporting", "API connections", "workflow design", "Documentation"],
   },
   {
-    id: "CASE-002",
-    category: "Rules · Automation",
-    outcome: "0 manual",
-    title: "Automated Late Fee & Hold System",
+    id: "EXP-003",
+    category: "Unit4",
+    outcome: "Safer go-lives",
+    period: "Feb 2021 - Dec 2021",
+    title: "ERP and API Integration Consultant",
     description:
-      "Rule-based triggers replaced manual account hold processing. Consistent, time-accurate fee application with full audit trail.",
-    tags: ["Rule Engine", "Event Triggers", "Workflow", "Audit Logging"],
+      "Built the integration layer between ERP systems and third-party platforms so operational teams could depend on cleaner data movement.",
+    impact:
+      "Protected data integrity during go-live transitions by validating workflows, mapping business requirements into configuration, and supporting controlled system change.",
+    tags: ["ERP systems", "REST APIs", "Data exchange", "Configuration", "Go-live support"],
   },
   {
-    id: "CASE-003",
-    category: "SQL · Performance",
-    outcome: "45s → 3s",
-    title: "Overdue Dashboard Query Optimisation",
+    id: "EXP-004",
+    category: "Fokal Studio",
+    outcome: "Cleaner client delivery",
+    period: "Apr 2019 - Jan 2021",
+    title: "Client Systems Consultant",
     description:
-      "Dashboard load time reduced 15× through execution plan analysis, targeted indexing, and CTE restructuring.",
-    tags: ["SQL", "Query Opt.", "CTE", "Indexing", "Dashboard"],
+      "Worked with clients where operational processes were too dependent on manual coordination, disconnected tools, and unclear data handoffs.",
+    impact:
+      "Improved delivery confidence through API integration, system configuration, data validation, and clearer implementation design.",
+    tags: ["API integration", "System configuration", "Data validation", "Client delivery"],
   },
   {
-    id: "CASE-004",
-    category: "n8n · API · Integration",
-    outcome: "2d → 10min",
-    title: "End-to-End Client Onboarding Automation",
+    id: "EXP-005",
+    category: "Property Finder",
+    outcome: "More reliable operations",
+    period: "Jan 2018 - Dec 2018",
+    title: "Operational Data Consultant",
     description:
-      "n8n workflow triggered by form submission routes data to CRM, project tool, and email with zero manual entry and consistent handoff regardless of staff availability.",
-    tags: ["n8n", "REST APIs", "Webhooks", "CRM Integration"],
+      "Supported data operations in a fast-paced environment where reporting accuracy, process discipline, and turnaround time directly affected daily operations.",
+    impact:
+      "Contributed to cleaner operational flow, more reliable data handling, and stronger process control across day-to-day workflows.",
+    tags: ["Implementation", "Configuration", "Data operations", "Process improvement"],
+  },
+  {
+    id: "EXP-006",
+    category: "E-Business Solutions | EBS · Casablanca",
+    outcome: "Systems foundation",
+    period: "Jan 2017 - Jan 2018",
+    title: "IT Consultant · Web Developer",
+    description:
+      "Built web applications, REST API integrations, and database-backed solutions for client business workflows.",
+    impact:
+      "Established the software engineering, API design, database, and systems-integration foundation behind my later data services consulting work.",
+    tags: ["Web applications", "REST APIs", "Database design", "System integration"],
   },
 ];
+
+// ─── Current Focus ───────────────────────────────────────────────────────────
+export const currentFocus = [
+  {
+    title: "Odoo implementation & configuration",
+    description:
+      "Implementing and configuring Odoo around real business workflows, with clean data structures, role-based processes, reporting needs, and integration points designed before automation starts.",
+    tags: ["Odoo", "ERP configuration", "Process design", "Data migration"],
+  },
+  {
+    title: "n8n automation for operations",
+    description:
+      "Building automation flows that connect forms, CRM, email, reporting, and back-office tools so teams stop copying data between systems and start working from reliable handoffs.",
+    tags: ["n8n", "Webhooks", "REST APIs", "Workflow automation"],
+  },
+  {
+    title: "AI training powered by data",
+    description:
+      "Helping teams use AI responsibly by grounding prompts, assistants, and training material in structured business data, documented processes, and measurable operational use cases.",
+    tags: ["AI training", "Prompt systems", "Knowledge bases", "Data quality"],
+  },
+] as const;
 
 // ─── Capabilities ─────────────────────────────────────────────────────────────
 export interface Capability {
@@ -109,24 +160,31 @@ export const capabilities: Capability[] = [
   },
   {
     icon: "Zap",
-    name: "Automation & Rule Engines",
+    name: "n8n Automation & Workflow Systems",
     description:
-      "Trigger-based workflow automation, rule engine configuration, and zero-manual-intervention system design.",
-    tags: ["n8n", "Rule Engines", "Triggers", "Workflows"],
+      "Operational automation using n8n, triggers, and workflow logic to remove repeated manual handling.",
+    tags: ["n8n", "Automation", "Triggers", "Workflows"],
+  },
+  {
+    icon: "Link",
+    name: "Odoo & ERP Implementation",
+    description:
+      "ERP implementation and configuration for operational processes, data migration, reporting needs, and integration readiness.",
+    tags: ["Odoo", "ERP", "Configuration", "Data migration"],
+  },
+  {
+    icon: "BrainCircuit",
+    name: "AI Training & Data-Driven AI",
+    description:
+      "AI training, prompt systems, knowledge bases, and AI workflows grounded in structured operational data.",
+    tags: ["AI training", "RAG", "LLM APIs", "Data quality"],
   },
   {
     icon: "Link",
     name: "APIs & Integrations",
     description:
-      "REST and SOAP API development, OAuth2, event ingestion with retry logic, and idempotent processing.",
-    tags: ["REST", "SOAP", "OAuth2", "FastAPI", "Webhooks"],
-  },
-  {
-    icon: "BrainCircuit",
-    name: "AI & Advanced Systems",
-    description:
-      "LLM integration, RAG pipelines, prompt engineering, observability dashboards, and AI cost tracking.",
-    tags: ["LLM APIs", "RAG", "ELK", "Docker", "Metrics"],
+      "REST and SOAP API development, OAuth2, webhook flows, cross-system reliability, and data exchange design.",
+    tags: ["REST", "SOAP", "OAuth2", "Webhooks"],
   },
 ];
 
@@ -145,8 +203,8 @@ export const operatingModel = {
   },
   tools: [
     "SQL", "SSRS", "PostgreSQL", "FastAPI", "Python", "n8n",
-    "REST APIs", "OAuth2", "Docker", "Jenkins", "Git",
-    "LLM APIs", "RAG", "ELK Stack", "Azure",
+    "Odoo", "REST APIs", "OAuth2", "Docker", "Jenkins", "Git",
+    "AI training", "LLM APIs", "RAG", "ELK Stack", "Azure",
   ],
 } as const;
 
