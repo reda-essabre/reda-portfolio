@@ -7,19 +7,18 @@
 /* ─── Design Tokens (Tailwind v4 @theme) ─── */
 @theme inline {
   /* Fonts */
-  --font-barlow: var(--font-barlow);
-  --font-barlow-sc: var(--font-barlow-sc);
-  --font-mono: var(--font-mono);
+  --font-barlow: var(--font-apple);
+  --font-barlow-sc: var(--font-apple);
+  --font-mono: var(--font-apple-mono);
 
   /* Brand colors */
   --color-brand-black: #0a0a0a;
-  --color-brand-surface: #141414;
-  --color-brand-surface-2: #1a1a1a;
-  --color-brand-surface-3: #222222;
-  --color-brand-red: #E50914;
+  --color-brand-surface: #ffffff;
+  --color-brand-surface-2: #f5f5f7;
+  --color-brand-surface-3: #e8e8ed;
+  --color-brand-blue: #0071e3;
 
-  /* Max width utility */
-  --width-content: 1200px;
+  /* Max width utility — explicit utility defined below via @utility */
 
   /* shadcn tokens (keep existing) */
   --color-background: var(--background);
@@ -62,6 +61,37 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ─── Custom utilities ─── */
+@utility max-w-content {
+  max-width: 1200px;
+}
+
+/* Apple-style description font — used across all section body text */
+.apple-text {
+  font-family: var(--font-apple);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: #6e6e73;
+  text-shadow: none;
+  line-height: 1.55;
+}
+
+.noise-overlay {
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px);
+  background-size: 3px 3px, 5px 5px;
+}
+
+/* Layout container — baked in CSS, bypasses any @layer utility conflicts */
+.max-w-content {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(24px, 4vw, 80px);
+  padding-right: clamp(24px, 4vw, 80px);
+}
+
 /* ─── Keyframes (shared across sections) ─── */
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
@@ -73,28 +103,31 @@
 }
 
 :root {
+  --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-apple-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
   /* Surfaces */
-  --black: #0a0a0a;
-  --surface: #141414;
-  --surface-2: #1a1a1a;
-  --surface-3: #222222;
+  --black: #f5f5f7;
+  --surface: #ffffff;
+  --surface-2: #f5f5f7;
+  --surface-3: #e8e8ed;
 
   /* Borders */
-  --border-custom: rgba(255, 255, 255, 0.07);
-  --border-md: rgba(255, 255, 255, 0.14);
+  --border-custom: rgba(0, 0, 0, 0.08);
+  --border-md: rgba(0, 0, 0, 0.14);
 
-  /* Red accent */
-  --red: #e50914;
-  --red-glow: rgba(229, 9, 20, 0.45);
-  --red-led: rgba(229, 9, 20, 0.15);
-  --red-dim: rgba(229, 9, 20, 0.08);
+  /* Blue accent */
+  --blue: #0071e3;
+  --blue-glow: rgba(0, 113, 227, 0.18);
+  --blue-led: rgba(0, 113, 227, 0.12);
+  --blue-dim: rgba(0, 113, 227, 0.07);
 
   /* Text */
-  --white: #ffffff;
-  --white-70: rgba(255, 255, 255, 0.7);
-  --white-40: rgba(255, 255, 255, 0.4);
-  --white-20: rgba(255, 255, 255, 0.2);
-  --white-08: rgba(255, 255, 255, 0.08);
+  --white: #1d1d1f;
+  --white-70: #6e6e73;
+  --white-40: #86868b;
+  --white-20: rgba(29, 29, 31, 0.42);
+  --white-08: rgba(29, 29, 31, 0.08);
 
   /* Availability */
   --green-avail: #4ade80;
@@ -134,12 +167,14 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 html {
@@ -149,7 +184,7 @@ html {
 body {
   background: var(--black);
   color: var(--white);
-  font-family: var(--font-barlow), sans-serif;
+  font-family: var(--font-apple);
   line-height: 1.5;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -157,7 +192,7 @@ body {
 
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid #e50914;
+  outline: 2px solid #0071e3;
   outline-offset: 2px;
   border-radius: 4px;
 }

@@ -5,10 +5,10 @@
 export const heroGradientConfig = {
   preset: "custom" as const,
   color1: "#0a0a0a",  // true black
-  color2: "#1a0000",  // near-black deep red
-  color3: "#0a0a0a",  // black again
-  speed: 10,
-  swirl: 30,
+  color2: "#061b2e",  // quiet deep blue
+  color3: "#111113",  // near-black
+  speed: 7,
+  swirl: 18,
   swirlIterations: 8,
   softness: 100,
   distortion: 2,
@@ -21,6 +21,6 @@ export const heroGradientConfig = {
 };
 
 export const heroNoiseConfig = {
-  opacity: 0.45,
+  opacity: 0.18,
   scale: 1.2,
 };

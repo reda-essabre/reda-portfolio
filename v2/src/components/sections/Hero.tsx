@@ -1,8 +1,52 @@
 "use client";
 
+import { useState } from "react";
 import AnimatedGradient from "@/components/ui/animated-gradient";
 import { heroGradientConfig, heroNoiseConfig } from "@/lib/gradient-configs";
 import { heroData } from "@/lib/data";
+
+function EyebrowBar({ eyebrow }: { eyebrow: string }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      className="inline-flex items-center gap-3 mb-6 px-4 py-2 rounded-full cursor-default"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        border: hovered ? "1px solid rgba(0,113,227,0.4)" : "1px solid rgba(255,255,255,0.08)",
+        background: hovered ? "rgba(0,113,227,0.06)" : "rgba(255,255,255,0.03)",
+        boxShadow: hovered ? "0 0 20px rgba(0,113,227,0.15), inset 0 0 10px rgba(0,113,227,0.04)" : "none",
+        transition: "all 0.25s ease",
+      }}
+    >
+      <span
+        className="w-[7px] h-[7px] rounded-full shrink-0"
+        style={{
+          background: "var(--green-avail)",
+          boxShadow: hovered
+            ? "0 0 12px rgba(74,222,128,0.8)"
+            : "0 0 8px rgba(74,222,128,0.5)",
+          animation: "pulse-dot 2s infinite",
+          transition: "box-shadow 0.25s",
+        }}
+        aria-hidden="true"
+      />
+      <span
+        className="font-barlow-sc font-bold uppercase"
+        style={{
+          fontSize: "11px",
+          letterSpacing: "0.16em",
+          color: hovered ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.4)",
+          textShadow: hovered ? "0 0 16px rgba(0,113,227,0.5)" : "none",
+          transition: "all 0.25s ease",
+        }}
+      >
+        {eyebrow}
+      </span>
+    </div>
+  );
+}
 
 export function Hero() {
   return (
@@ -23,7 +67,7 @@ export function Hero() {
           className="absolute bottom-0 left-0 right-0 h-40"
           style={{
             background:
-              "linear-gradient(to top, rgba(229,9,20,0.1) 0%, rgba(229,9,20,0.03) 40%, transparent 100%)",
+              "linear-gradient(to top, rgba(0,113,227,0.1) 0%, rgba(0,113,227,0.03) 40%, transparent 100%)",
           }}
         />
         {/* 1px LED strip */}
@@ -31,9 +75,9 @@ export function Hero() {
           className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[55%] h-px"
           style={{
             background:
-              "linear-gradient(90deg, transparent, rgba(229,9,20,0.6), transparent)",
+              "linear-gradient(90deg, transparent, rgba(0,113,227,0.6), transparent)",
             boxShadow:
-              "0 0 20px 4px rgba(229,9,20,0.25), 0 0 60px 12px rgba(229,9,20,0.1)",
+              "0 0 20px 4px rgba(0,113,227,0.25), 0 0 60px 12px rgba(0,113,227,0.1)",
           }}
         />
       </div>
@@ -42,20 +86,7 @@ export function Hero() {
       <div className="relative z-10 max-w-content mx-auto px-6 sm:px-10 lg:px-20 pt-32 pb-28">
 
         {/* Eyebrow */}
-        <div className="flex items-center gap-2 mb-6">
-          <span
-            className="w-[7px] h-[7px] rounded-full"
-            style={{
-              background: "var(--green-avail)",
-              boxShadow: "0 0 8px rgba(74,222,128,0.5)",
-              animation: "pulse-dot 2s infinite",
-            }}
-            aria-hidden="true"
-          />
-          <span className="font-mono text-[11px] tracking-[0.18em] uppercase text-white/40">
-            {heroData.eyebrow}
-          </span>
-        </div>
+        <EyebrowBar eyebrow={heroData.eyebrow} />
 
         {/* Headline */}
         <h1
@@ -63,7 +94,7 @@ export function Hero() {
           style={{ fontSize: "clamp(44px, 6.5vw, 72px)", letterSpacing: "-0.02em" }}
         >
           <span className="block text-white">{heroData.headlineParts.before}</span>
-          <span className="block" style={{ color: "#E50914" }}>
+          <span className="block" style={{ color: "#0071e3" }}>
             {heroData.headlineParts.accent}
           </span>
           <span className="block text-white">{heroData.headlineParts.after}</span>
@@ -71,8 +102,16 @@ export function Hero() {
 
         {/* Subtext */}
         <p
-          className="font-barlow font-light text-white/40 max-w-[520px] mb-10"
-          style={{ fontSize: "16px", lineHeight: "1.75" }}
+          className="max-w-[560px] mb-10"
+          style={{
+            fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif",
+            fontSize: "19px",
+            fontWeight: 300,
+            lineHeight: 1.65,
+            letterSpacing: "0.01em",
+            color: "rgba(255,255,255,0.88)",
+            textShadow: "0 0 30px rgba(0,113,227,0.25), 0 0 60px rgba(0,113,227,0.1)",
+          }}
         >
           {heroData.subtext}
         </p>
@@ -83,10 +122,10 @@ export function Hero() {
             href="#contact"
             className="font-barlow font-semibold text-white px-7 py-3 rounded-[5px] transition-transform duration-200 hover:scale-[1.02]"
             style={{
-              background: "#E50914",
+              background: "#0071e3",
               fontSize: "15px",
               boxShadow:
-                "0 4px 24px rgba(229,9,20,0.5), 0 0 40px rgba(229,9,20,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
+                "0 4px 24px rgba(0,113,227,0.5), 0 0 40px rgba(0,113,227,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
             }}
           >
             Let&apos;s Talk →

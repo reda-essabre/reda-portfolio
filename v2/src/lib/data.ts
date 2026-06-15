@@ -2,12 +2,12 @@
 export const heroData = {
   eyebrow: "Available for consulting · Paris, France · Remote",
   headlineParts: {
-    before: "SYSTEMS THAT MAKE",
-    accent: "GROWTH",
-    after: "SCALABLE.",
+    before: "SENIOR DATA",
+    accent: "SERVICES",
+    after: "CONSULTANT.",
   },
   subtext:
-    "I design automation, reporting, and data systems that remove friction — so operations run reliably at scale.",
+    "I design, automate, and stabilize data services for operational teams: SQL reporting, integrations, workflow automation, and AI-ready data systems.",
   metrics: [
     { value: "−30%", label: "Response time" },
     { value: "−20%", label: "Manual errors" },
@@ -25,10 +25,10 @@ export const proofMetrics = [
 ] as const;
 
 export const award = {
-  label: "◆ Q2 2023 UNSUNG HERO — EUROPE",
+  label: "Q2 2023 Unsung Hero, Europe",
   org: "Leadership Award · Thesis SM / Thesis Cloud",
   quote:
-    "Goes deep into customer needs. Strong ownership in automations and APIs. Detail-oriented in resolving issues fully. Goes the extra mile — quick to respond when challenges arise.",
+    "Goes deep into customer needs. Strong ownership in automations and APIs. Detail-oriented in resolving issues fully. Goes the extra mile and responds quickly when challenges arise.",
 } as const;
 
 // ─── Case Studies ─────────────────────────────────────────────────────────────
@@ -49,7 +49,7 @@ export const caseStudies: CaseStudy[] = [
     outcome: "9-wk build",
     title: "AI Data-Ops Platform",
     description:
-      "Full system design from event ingestion to LLM integration — idempotent queuing, RAG, observability dashboard, and AI cost tracking. Production-grade reliability patterns throughout.",
+      "Full system design from event ingestion to LLM integration, with idempotent queuing, RAG, observability dashboard, and AI cost tracking. Production-grade reliability patterns throughout.",
     tags: ["FastAPI", "PostgreSQL", "Queues", "Idempotency", "RAG", "LLM APIs", "Observability"],
     featured: true,
   },
@@ -59,7 +59,7 @@ export const caseStudies: CaseStudy[] = [
     outcome: "−3h/wk",
     title: "Funding Category Extraction Pipeline",
     description:
-      "Eliminated 3h/week of manual JSON extraction. SQL pipeline with live dashboard output — analysts redirected from data wrangling to interpretation.",
+      "Eliminated 3h/week of manual JSON extraction. SQL pipeline with live dashboard output so analysts could focus on interpretation instead of data wrangling.",
     tags: ["SQL", "JSON Path", "SSRS", "Dashboard"],
   },
   {
@@ -75,7 +75,7 @@ export const caseStudies: CaseStudy[] = [
     id: "CASE-003",
     category: "SQL · Performance",
     outcome: "45s → 3s",
-    title: "Query Optimisation — Overdue Dashboard",
+    title: "Overdue Dashboard Query Optimisation",
     description:
       "Dashboard load time reduced 15× through execution plan analysis, targeted indexing, and CTE restructuring.",
     tags: ["SQL", "Query Opt.", "CTE", "Indexing", "Dashboard"],
@@ -86,7 +86,7 @@ export const caseStudies: CaseStudy[] = [
     outcome: "2d → 10min",
     title: "End-to-End Client Onboarding Automation",
     description:
-      "n8n workflow triggered by form submission routes data to CRM, project tool, and email — zero manual entry, consistent regardless of staff availability.",
+      "n8n workflow triggered by form submission routes data to CRM, project tool, and email with zero manual entry and consistent handoff regardless of staff availability.",
     tags: ["n8n", "REST APIs", "Webhooks", "CRM Integration"],
   },
 ];
@@ -102,9 +102,9 @@ export interface Capability {
 export const capabilities: Capability[] = [
   {
     icon: "Database",
-    name: "Data Engineering & Reporting",
+    name: "Data Services & Reporting",
     description:
-      "Complex SQL queries, SSRS pipelines, JSON extraction, and stakeholder dashboards built to run in production.",
+      "Complex SQL queries, SSRS pipelines, JSON extraction, and stakeholder dashboards delivered as reliable business services.",
     tags: ["SQL", "SSRS", "JSON", "PostgreSQL", "Dashboards"],
   },
   {
@@ -132,11 +132,11 @@ export const capabilities: Capability[] = [
 
 // ─── Operating Model ──────────────────────────────────────────────────────────
 export const operatingModel = {
-  quote: "If a human repeats a task more than twice, a system should be doing it.",
+  quote: "A data service is only useful when people can trust it every day.",
   process: [
-    { step: "01", title: "Understand", detail: "Map the problem domain, manual pain points, and business context." },
-    { step: "02", title: "Design", detail: "Architect the right system abstraction — no over-engineering, no shortcuts." },
-    { step: "03", title: "Automate", detail: "Build, test, and ship to production. Reliable, auditable, maintainable." },
+    { step: "01", title: "Understand", detail: "Map operational pain points, data ownership, dependencies, and business context." },
+    { step: "02", title: "Design", detail: "Architect the right data service with clear contracts, clean handoffs, and pragmatic controls." },
+    { step: "03", title: "Automate", detail: "Build, test, and ship reliable systems with monitoring, auditability, and maintainable documentation." },
   ],
   bio: {
     years: "6+",
@@ -153,7 +153,7 @@ export const operatingModel = {
 // ─── Contact ──────────────────────────────────────────────────────────────────
 export const contact = {
   email: "re.essabre@gmail.com",
-  linkedin: "https://linkedin.com/in/reda-essabre",
+  linkedin: "https://www.linkedin.com/in/reda-e-65b301173/",
   github: "https://github.com/reda-essabre",
   phone: "+33 6 52 52 80 26",
 } as const;

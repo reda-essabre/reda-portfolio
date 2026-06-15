@@ -1,36 +1,10 @@
 import type { Metadata } from "next";
-import {
-  Barlow,
-  Barlow_Semi_Condensed,
-  IBM_Plex_Mono,
-} from "next/font/google";
 import "./globals.css";
 
-const barlow = Barlow({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-barlow",
-  display: "swap",
-});
-
-const barlowSemiCondensed = Barlow_Semi_Condensed({
-  subsets: ["latin"],
-  weight: ["700", "800", "900"],
-  variable: "--font-barlow-sc",
-  display: "swap",
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["300", "400"],
-  variable: "--font-mono",
-  display: "swap",
-});
-
 export const metadata: Metadata = {
-  title: "Reda Essabre — Data Engineer & Automation Expert",
+  title: "Reda Essabre — Senior Data Services Consultant",
   description:
-    "I design automation, reporting, and data systems that remove friction — so operations run reliably at scale. Paris, France · Remote-ready.",
+    "Senior data services consultant designing automation, reporting, integrations, and AI-ready data systems. Paris, France · Remote-ready.",
 };
 
 export default function RootLayout({
@@ -40,11 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body
-        className={`${barlow.variable} ${barlowSemiCondensed.variable} ${ibmPlexMono.variable}`}
-      >
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

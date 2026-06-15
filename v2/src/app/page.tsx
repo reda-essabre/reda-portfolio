@@ -1,5 +1,4 @@
-import { NavBar } from "@/components/sections/NavBar";
-import { Hero } from "@/components/sections/Hero";
+import { PrismaHero } from "@/components/ui/prisma-hero";
 import { ProofStrip } from "@/components/sections/ProofStrip";
 import { SelectedWork } from "@/components/sections/SelectedWork";
 import { Capabilities } from "@/components/sections/Capabilities";
@@ -10,8 +9,7 @@ import { Footer } from "@/components/sections/Footer";
 export default function Home() {
   return (
     <main>
-      <NavBar />
-      <Hero />
+      <PrismaHero />
       <ProofStrip />
       <SelectedWork />
       <Capabilities />

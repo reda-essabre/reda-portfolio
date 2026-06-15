@@ -1,43 +1,57 @@
 import { contact } from "@/lib/data";
+import { Mail } from "lucide-react";
+import { GitHubIcon, LinkedInIcon } from "@/components/shared/SocialIcons";
 
 export function Footer() {
   return (
     <footer
-      className="py-8"
-      style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
+      className="bg-white py-8"
+      style={{ borderTop: "1px solid rgba(0,0,0,0.08)" }}
     >
       <div className="max-w-content mx-auto px-6 sm:px-10 lg:px-20 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-3">
           <span
-            className="font-barlow-sc font-black text-base text-[#E50914]"
-            style={{ textShadow: "0 0 12px rgba(229,9,20,0.4)" }}
+            className="font-semibold text-base text-[#0071e3]"
+            style={{ textShadow: "none" }}
           >
             RE
           </span>
-          <span className="font-barlow font-medium text-sm text-white/40">
-            Reda Essabre · Data Engineer & Automation Expert
+          <span className="apple-text" style={{ fontSize: "13px" }}>
+            Reda Essabre · Senior Data Services Consultant
           </span>
         </div>
 
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3">
+          <a
+            href={`mailto:${contact.email}`}
+            aria-label="Email Reda"
+            title="Email"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#6e6e73] transition-colors duration-150 hover:text-[#1d1d1f]"
+          >
+            <Mail size={16} />
+          </a>
           <a
             href={contact.linkedin}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-[10px] tracking-[0.1em] uppercase text-white/20 hover:text-white/50 transition-colors duration-150"
+            aria-label="LinkedIn profile"
+            title="LinkedIn"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#6e6e73] transition-colors duration-150 hover:text-[#1d1d1f]"
           >
-            LinkedIn ↗
+            <LinkedInIcon size={16} />
           </a>
           <a
             href={contact.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-[10px] tracking-[0.1em] uppercase text-white/20 hover:text-white/50 transition-colors duration-150"
+            aria-label="GitHub profile"
+            title="GitHub"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#6e6e73] transition-colors duration-150 hover:text-[#1d1d1f]"
           >
-            GitHub ↗
+            <GitHubIcon size={16} />
           </a>
-          <span className="font-mono text-[10px] text-white/15">
-            © 2025 · Paris, France
+          <span className="text-[13px] text-[#86868b]">
+            © 2026 · Paris, France
           </span>
         </div>
       </div>
